@@ -2,32 +2,44 @@ package com.gfu.gestioninventario.Models;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ventas")
-public class Ventas {
+public class Venta {
 
     //ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "venta_id")
     private Integer ventaId;
+    @Column(name = "numeroFactura")
     private String numeroFactura;
-    private Integer clienteId;
-    private Integer usuarioId;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", referencedColumnName = "cliente_id", nullable = false)
+    private Cliente clienteId; // Relación con Cliente
+    @Column(name = "usuario_id")
+    private Integer usuarioId; // Después se agregará la relación con usuarios
+    @Column(name = "fecha_venta")
     private Date fechaVenta;
+    @Column(name = "total")
     private Double total;
+    @Column(name = "estado")
     private Boolean estado;
+    @Column(name = "notas")
     private String notas;
+    @OneToMany(mappedBy = "venta") // Relación con DetalleVenta
+    private List<DetalleVenta> detalleVentas;
 
     //CONSTRUCTORES
     //DEFAULT
-    public Ventas() {
+    public Venta() {
     }
 
     //CON ATRIBUTOS
-    public Ventas(Integer ventaId, String numeroFactura,
-                  Integer clienteId, Integer usuarioId,
-                  Date fechaVenta, Double total, Boolean estado, String notas) {
+    public Venta(Integer ventaId, String numeroFactura,
+                 Cliente clienteId, Integer usuarioId,
+                 Date fechaVenta, Double total, Boolean estado, String notas) {
         this.ventaId = ventaId;
         this.numeroFactura = numeroFactura;
         this.clienteId = clienteId;
@@ -55,11 +67,11 @@ public class Ventas {
         this.numeroFactura = numeroFactura;
     }
 
-    public Integer getClienteId() {
+    public Cliente getClienteId() {
         return clienteId;
     }
 
-    public void setClienteId(Integer clienteId) {
+    public void setClienteId(Cliente clienteId) {
         this.clienteId = clienteId;
     }
 
@@ -101,5 +113,13 @@ public class Ventas {
 
     public void setNotas(String notas) {
         this.notas = notas;
+    }
+
+    public List<DetalleVenta> getDetalleVentas() {
+        return detalleVentas;
+    }
+
+    public void setDetalleVentas(List<DetalleVenta> detalleVentas) {
+        this.detalleVentas = detalleVentas;
     }
 }

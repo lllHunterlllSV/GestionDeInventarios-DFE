@@ -8,10 +8,20 @@ public class DetalleVenta {
     //ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "detalleVenta_id")
     private Integer detalleVentaId;
-    private Integer ventaId;
+
+    @ManyToOne
+    @JoinColumn(name = "venta_id", referencedColumnName = "venta_id", nullable = false) // Relación con Venta
+    private Venta ventaId;
+
+    @Column(name = "producto_id") // Después se agregará la relación con Producto
     private Integer productoId;
+
+    @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name = "precio_unitario")
     private Double precioUnitario;
 
     //CONSTRUCTORES
@@ -20,7 +30,7 @@ public class DetalleVenta {
     }
 
     //CON ATRIBUTOS
-    public DetalleVenta(Integer detalleVentaId, Integer ventaId,
+    public DetalleVenta(Integer detalleVentaId, Venta ventaId,
                         Integer productoId, Integer cantidad, Double precioUnitario) {
         this.detalleVentaId = detalleVentaId;
         this.ventaId = ventaId;
@@ -38,11 +48,11 @@ public class DetalleVenta {
         this.detalleVentaId = detalleVentaId;
     }
 
-    public Integer getVentaId() {
+    public Venta getVentaId() {
         return ventaId;
     }
 
-    public void setVentaId(Integer ventaId) {
+    public void setVentaId(Venta ventaId) {
         this.ventaId = ventaId;
     }
 

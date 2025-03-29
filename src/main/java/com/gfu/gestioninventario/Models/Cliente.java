@@ -3,37 +3,43 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "clientes")
-public class Clientes {
+public class Cliente {
 
     //ATRIBUTOS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Column(name = "cliente_id")
     private Integer clienteId;
+
+    @Column(name = "nombreCliente")
     private String nombreCliente;
-    private Integer tipoClienteId;
+
+    @ManyToOne
+    @JoinColumn(name = "tipoCliente_id", referencedColumnName = "tipoCliente_id", nullable = false)
+    private TipoCliente tipoCliente; // Relación con TipoCliente
+
+    @Column(name = "NIF")
     private String NIF;
+
+    @Column(name = "DUI")
     private String DUI;
+
+    @Column(name = "estado")
     private Boolean estado;
+
+    @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "email")
     private String email;
 
     //CONSTRUCTORES
     //DEFAULT
-    public Clientes() {
+    public Cliente() {
     }
     //CON ATRIBUTOS
-    public Clientes(Integer clienteId, String nombreCliente,
-                    Integer tipoClienteId, String NIF, String DUI,
-                    Boolean estado, String telefono, String email) {
-        this.clienteId = clienteId;
-        this.nombreCliente = nombreCliente;
-        this.tipoClienteId = tipoClienteId;
-        this.NIF = NIF;
-        this.DUI = DUI;
-        this.estado = estado;
-        this.telefono = telefono;
-        this.email = email;
-    }
+
 
     //GETTERS AND SETTERS
     public Integer getClienteId() {
@@ -48,12 +54,15 @@ public class Clientes {
     public void setNombreCliente(String nombreCliente) {
         this.nombreCliente = nombreCliente;
     }
-    public Integer getTipoClienteId() {
-        return tipoClienteId;
+
+    public TipoCliente getTipoCliente() {
+        return tipoCliente;
     }
-    public void setTipoClienteId(Integer tipoClienteId) {
-        this.tipoClienteId = tipoClienteId;
+
+    public void setTipoCliente(TipoCliente tipoCliente) {
+        this.tipoCliente = tipoCliente;
     }
+
     public String getNIF() {
         return NIF;
     }
