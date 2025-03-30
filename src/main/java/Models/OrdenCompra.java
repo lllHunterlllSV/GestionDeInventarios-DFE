@@ -1,16 +1,32 @@
 package Models;
 
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+@Entity
+@Table(name = "ordenes_compra")
 public class OrdenCompra {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "orden_id")
     private Integer ordenId;
+
+    @ManyToOne
+    @JoinColumn(name = "proveedor_id", nullable = false)
     private Proveedor proveedor;
+
+    @Column(name = "fecha_orden")
     private Date fechaOrden;
-    private String estado; // "Pendiente", "Recibida", "Cancelada"
+
+    @Column(name = "estado")
+    private String estado; // Ej: "Pendiente", "Recibida", "Cancelada"
+
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleOrdenCompra> detalles;
 
-    // Constructor vacío
+    // Constructor vacío (requerido por JPA)
     public OrdenCompra() {
     }
 

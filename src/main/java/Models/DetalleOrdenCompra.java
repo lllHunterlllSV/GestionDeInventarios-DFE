@@ -1,10 +1,28 @@
 package Models;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "detalle_ordenCompra")
 public class DetalleOrdenCompra {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "detalle_id")
     private Integer detalleId;
+
+    @ManyToOne
+    @JoinColumn(name = "orden_id", nullable = false)
     private OrdenCompra orden;
+
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
+
+    @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name = "precio_unitario")
     private Double precioUnitario;
 
     // Constructor vacío
