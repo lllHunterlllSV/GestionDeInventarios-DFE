@@ -1,15 +1,39 @@
 package Models;
 
+import jakarta.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "devoluciones")
 public class Devolucion {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "devolucion_id")
     private Integer devolucionId;
+
+    @ManyToOne
+    @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
+
+    @ManyToOne
+    @JoinColumn(name = "detalleVenta_id", nullable = false)
     private DetalleVenta detalleVenta;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name = "motivo")
     private String motivo;
+
+    @Column(name = "fecha_devolucion")
     private Date fechaDevolucion;
+
+    @Column(name = "estado")
     private String estado; // "Solicitada", "Aprobada", "Rechazada"
 
     // Constructor vacío

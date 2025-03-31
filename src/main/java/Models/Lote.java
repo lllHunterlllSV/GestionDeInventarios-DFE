@@ -1,15 +1,38 @@
 package Models;
 
+import jakarta.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "lotes")
 public class Lote {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lote_id")
     private Integer loteId;
+
+    @ManyToOne
+    @JoinColumn(name = "orden_id", nullable = false)
     private OrdenCompra orden;
+
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
+
+    @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name = "fecha_ingreso")
     private Date fechaIngreso;
+
+    @Column(name = "fecha_vencimiento")
     private Date fechaVencimiento;
+
+    @Column(name = "costo_unitario")
     private Double costoUnitario;
+
+    @Column(name = "estado")
     private Boolean estado; // true = Activo, false = Inactivo
 
     // Constructor vacío
