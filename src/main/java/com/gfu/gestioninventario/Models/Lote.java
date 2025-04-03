@@ -2,6 +2,7 @@ package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "lotes")
@@ -11,14 +12,17 @@ public class Lote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lote_id")
     private Integer loteId;
-
+///relacion orden compra
     @ManyToOne
     @JoinColumn(name = "orden_id", nullable = false)
     private OrdenCompra orden;
-
+/// relacion con productos
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
+/// control de movimientos
+    @OneToMany(mappedBy = "lote")
+    private Set<ControlMovimientos> controlMovimientosSet;
 
     @Column(name = "cantidad")
     private Integer cantidad;
@@ -40,14 +44,18 @@ public class Lote {
     }
 
     // Constructor con parámetros
-    public Lote(OrdenCompra orden, Producto producto, Integer cantidad, Date fechaIngreso, Date fechaVencimiento, Double costoUnitario, Boolean estado) {
+
+
+    public Lote(Integer loteId, OrdenCompra orden, Set<ControlMovimientos> controlMovimientosSet, Producto producto, Integer cantidad, Date fechaIngreso, Date fechaVencimiento, Boolean estado, Double costoUnitario) {
+        this.loteId = loteId;
         this.orden = orden;
+        this.controlMovimientosSet = controlMovimientosSet;
         this.producto = producto;
         this.cantidad = cantidad;
         this.fechaIngreso = fechaIngreso;
         this.fechaVencimiento = fechaVencimiento;
-        this.costoUnitario = costoUnitario;
         this.estado = estado;
+        this.costoUnitario = costoUnitario;
     }
 
     // Getters y Setters
@@ -113,5 +121,13 @@ public class Lote {
 
     public void setEstado(Boolean estado) {
         this.estado = estado;
+    }
+
+    public Set<ControlMovimientos> getControlMovimientosSet() {
+        return controlMovimientosSet;
+    }
+
+    public void setControlMovimientosSet(Set<ControlMovimientos> controlMovimientosSet) {
+        this.controlMovimientosSet = controlMovimientosSet;
     }
 }

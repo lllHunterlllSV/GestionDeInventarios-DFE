@@ -28,24 +28,26 @@ public class Producto {
     @Column(name = "descripcion")
     private String descripcion;
 
+    ///relacion categoria
     @ManyToOne
     @JoinColumn(name= "categoria_id", nullable = false)
     private Categoria categoria;
 
+    ///relacion medidas
     @ManyToOne
     @JoinColumn(name = "medida_id", nullable = false)
     private Medidas medidas;
-
+///relcion proveedores
     @ManyToOne
     @JoinColumn(name = "proveedor_id", nullable = false)
     private Proveedores proveedores;
-
+///relacion detalle compra
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<DetalleOrdenCompra> detalleOrdenCompras;
-
+///relacion detalle venta
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<DetalleVenta> detalleVentas;
-
+///relacion  lotes
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<Lote> lotes;
 
@@ -135,6 +137,7 @@ public class Producto {
     public void setLotes(List<Lote> lotes) {
         this.lotes = lotes;
     }
+
 
     
 }

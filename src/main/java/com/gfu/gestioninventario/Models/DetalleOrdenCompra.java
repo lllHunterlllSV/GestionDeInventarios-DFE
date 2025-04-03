@@ -2,6 +2,8 @@ package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "detalle_ordenCompra")
 public class DetalleOrdenCompra {
@@ -10,11 +12,11 @@ public class DetalleOrdenCompra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "detalle_id")
     private Integer detalleId;
-
+//relacion orden de compra
     @ManyToOne
     @JoinColumn(name = "orden_id", nullable = false)
     private OrdenCompra orden;
-
+//relacion productos
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
@@ -24,6 +26,12 @@ public class DetalleOrdenCompra {
 
     @Column(name = "precio_unitario")
     private Double precioUnitario;
+/// relacion devoluciones de compra
+     @OneToMany(mappedBy = "detalleOrdenCompra")
+      private List<DevolucionCompra>devoluciones;
+
+
+
 
     // Constructor vacío
     public DetalleOrdenCompra() {
@@ -76,5 +84,15 @@ public class DetalleOrdenCompra {
 
     public void setPrecioUnitario(Double precioUnitario) {
         this.precioUnitario = precioUnitario;
+
     }
+
+    public List<DevolucionCompra> getDevoluciones() {
+        return devoluciones;
+    }
+
+    public void setDevoluciones(List<DevolucionCompra> devoluciones) {
+        this.devoluciones = devoluciones;
+    }
+
 }

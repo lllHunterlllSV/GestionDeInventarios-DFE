@@ -2,11 +2,9 @@ package com.gfu.gestioninventario.Models;
 
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 public class Medidas {
@@ -17,6 +15,9 @@ public class Medidas {
 
     @Column(nullable = false, length = 30)
     private String medida;
+
+    @OneToMany(mappedBy ="medidas")
+    private Set<Producto> producto;
 
     // Getters y setters
 
@@ -36,13 +37,23 @@ public class Medidas {
         this.medida = medida;
     }
 
+    public Set<Producto> getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Set<Producto> producto) {
+        this.producto = producto;
+    }
+
     // Constructor sin parámetros
     public Medidas() {
     }
 
     // Constructor con parámetros
-    public Medidas(Integer medidaId, String medida) {
-        this.medidaId = medidaId;
+
+    public Medidas(String medida, Integer medidaId, Set<Producto> producto) {
         this.medida = medida;
+        this.medidaId = medidaId;
+        this.producto = producto;
     }
 }

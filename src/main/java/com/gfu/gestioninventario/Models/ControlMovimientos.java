@@ -10,7 +10,7 @@ public class ControlMovimientos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movimiento_id")
     private Integer id;
-
+/// relacion lote
     @ManyToOne
     @JoinColumn(name = "lote_id", nullable = false)
     private Lote lote;
@@ -22,13 +22,16 @@ public class ControlMovimientos {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMovimiento;
 
+    /// relacion usuario
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuarios usuario;
-
+///relacion tipo
     @ManyToOne
     @JoinColumn(name = "tipomovimiento_id", nullable = false)
     private TipoMovimiento tipoMovimiento;
+
+
 
 
     public ControlMovimientos(Integer id, Lote lote, Integer cantidad, Date fechaMovimiento, Usuarios usuario, TipoMovimiento tipoMovimiento) {
@@ -89,4 +92,5 @@ public class ControlMovimientos {
     public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
         this.tipoMovimiento = tipoMovimiento;
     }
+
 }

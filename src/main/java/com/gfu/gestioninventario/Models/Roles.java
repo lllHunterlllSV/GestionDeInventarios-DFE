@@ -20,12 +20,14 @@ public class Roles {
     private Set<Usuarios> usuarios;
 
 
+    public Roles(RoleType tipo_rol, Integer role_id, Set<Usuarios> usuarios) {
+        this.tipo_rol = tipo_rol;
+        this.role_id = role_id;
+        this.usuarios = usuarios;
+    }
 
     /// constructor
-    public Roles(Integer role_id, RoleType tipo_rol) {
-        this.role_id = role_id;
-        this.tipo_rol = tipo_rol;
-    }
+
     public Roles() {
 
     }
@@ -41,6 +43,14 @@ public class Roles {
 
     public RoleType getTipo_rol() {
         return tipo_rol;
+    }
+
+    public Set<Usuarios> getUsuarios() {
+        return usuarios;
+    }
+
+    public void setUsuarios(Set<Usuarios> usuarios) {
+        this.usuarios = usuarios;
     }
 
     public void setTipo_rol(RoleType tipo_rol) {

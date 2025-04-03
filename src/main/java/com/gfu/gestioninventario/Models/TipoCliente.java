@@ -13,8 +13,6 @@ public class TipoCliente {
     @Column(name = "tipoCliente_id")
     private Integer tipoClienteId;
 
-    @Column(name = "tipoCliente")
-    private String tipoCliente;
 
     // Relación inversa con Cliente
     @OneToMany(mappedBy = "tipoCliente")
@@ -25,9 +23,11 @@ public class TipoCliente {
     public TipoCliente() {
     }
     //CON ATRIBUTOS
-    public TipoCliente(Integer tipoClienteId, String tipoCliente) {
+
+
+    public TipoCliente(List<Cliente> clientes, Integer tipoClienteId) {
+        this.clientes = clientes;
         this.tipoClienteId = tipoClienteId;
-        this.tipoCliente = tipoCliente;
     }
 
     //GETTERS AND SETTERS
@@ -37,12 +37,7 @@ public class TipoCliente {
     public void setTipoClienteId(Integer tipoClienteId) {
         this.tipoClienteId = tipoClienteId;
     }
-    public String getTipoCliente() {
-        return tipoCliente;
-    }
-    public void setTipoCliente(String tipoCliente) {
-        this.tipoCliente = tipoCliente;
-    }
+
     public List<Cliente> getClientes() {
         return clientes;
     }
@@ -50,4 +45,5 @@ public class TipoCliente {
     public void setClientes(List<Cliente> clientes) {
         this.clientes = clientes;
     }
+
 }

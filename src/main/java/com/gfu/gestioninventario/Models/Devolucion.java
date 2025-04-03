@@ -12,17 +12,18 @@ public class Devolucion {
     @Column(name = "devolucion_id")
     private Integer devolucionId;
 
+    //relacion devolucion a venta
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
-    private Venta venta;
-
+    private Venta ventas;
+//relacion detalle venta
     @ManyToOne
     @JoinColumn(name = "detalleVenta_id", nullable = false)
     private DetalleVenta detalleVenta;
-
+//relacion usuario
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    private Usuarios usuario;
 
     @Column(name = "cantidad")
     private Integer cantidad;
@@ -41,14 +42,17 @@ public class Devolucion {
     }
 
     // Constructor con parámetros
-    public Devolucion(Venta venta, DetalleVenta detalleVenta, Usuario usuario, Integer cantidad, String motivo, Date fechaDevolucion, String estado) {
-        this.venta = venta;
-        this.detalleVenta = detalleVenta;
-        this.usuario = usuario;
-        this.cantidad = cantidad;
-        this.motivo = motivo;
-        this.fechaDevolucion = fechaDevolucion;
+
+
+    public Devolucion(Integer devolucionId, String estado, Date fechaDevolucion, String motivo, Integer cantidad, Usuarios usuario, DetalleVenta detalleVenta, Venta ventas) {
+        this.devolucionId = devolucionId;
         this.estado = estado;
+        this.fechaDevolucion = fechaDevolucion;
+        this.motivo = motivo;
+        this.cantidad = cantidad;
+        this.usuario = usuario;
+        this.detalleVenta = detalleVenta;
+        this.ventas = ventas;
     }
 
     // Getters y Setters
@@ -60,12 +64,12 @@ public class Devolucion {
         this.devolucionId = devolucionId;
     }
 
-    public Venta getVenta() {
-        return venta;
+    public Venta getVentas() {
+        return ventas;
     }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
+    public void setVentas(Venta ventas) {
+        this.ventas = ventas;
     }
 
     public DetalleVenta getDetalleVenta() {
@@ -76,11 +80,11 @@ public class Devolucion {
         this.detalleVenta = detalleVenta;
     }
 
-    public Usuario getUsuario() {
+    public Usuarios getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(Usuarios usuario) {
         this.usuario = usuario;
     }
 

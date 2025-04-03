@@ -1,6 +1,8 @@
 package com.gfu.gestioninventario.Models;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "clientes")
 public class Cliente {
@@ -14,10 +16,14 @@ public class Cliente {
 
     @Column(name = "nombreCliente")
     private String nombreCliente;
-
+    // Relación con TipoCliente
     @ManyToOne
     @JoinColumn(name = "tipoCliente_id", referencedColumnName = "tipoCliente_id", nullable = false)
-    private TipoCliente tipoCliente; // Relación con TipoCliente
+    private TipoCliente tipoCliente;
+    //Relacion con venta
+    @OneToMany(mappedBy = "cliente")
+    private List<Venta> ventas;
+
 
     @Column(name = "NIF")
     private String NIF;
@@ -40,6 +46,18 @@ public class Cliente {
     }
     //CON ATRIBUTOS
 
+
+    public Cliente(Integer clienteId, String email, String telefono, Boolean estado, String DUI, String NIF, List<Venta> ventas, TipoCliente tipoCliente, String nombreCliente) {
+        this.clienteId = clienteId;
+        this.email = email;
+        this.telefono = telefono;
+        this.estado = estado;
+        this.DUI = DUI;
+        this.NIF = NIF;
+        this.ventas = ventas;
+        this.tipoCliente = tipoCliente;
+        this.nombreCliente = nombreCliente;
+    }
 
     //GETTERS AND SETTERS
     public Integer getClienteId() {
@@ -92,5 +110,13 @@ public class Cliente {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
     }
 }

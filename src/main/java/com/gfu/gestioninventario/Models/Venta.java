@@ -15,11 +15,23 @@ public class Venta {
     private Integer ventaId;
     @Column(name = "numeroFactura")
     private String numeroFactura;
+
+    // Relación con Cliente
     @ManyToOne
     @JoinColumn(name = "cliente_id", referencedColumnName = "cliente_id", nullable = false)
-    private Cliente clienteId; // Relación con Cliente
-    @Column(name = "usuario_id")
-    private Integer usuarioId; // Después se agregará la relación con usuarios
+    private Cliente cliente;
+   //relacion con usuario
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id", nullable = false)
+    private Usuarios usuarioId;
+    // Relación con DetalleVenta
+    @OneToMany(mappedBy = "venta")
+    private List<DetalleVenta> detalleVentas;
+
+    //relacion con devoluciones
+    @OneToMany(mappedBy = "ventas")
+    private List<Devolucion> devoluciones;
+
     @Column(name = "fecha_venta")
     private Date fechaVenta;
     @Column(name = "total")
@@ -28,8 +40,8 @@ public class Venta {
     private Boolean estado;
     @Column(name = "notas")
     private String notas;
-    @OneToMany(mappedBy = "venta") // Relación con DetalleVenta
-    private List<DetalleVenta> detalleVentas;
+
+
 
     //CONSTRUCTORES
     //DEFAULT
@@ -37,17 +49,19 @@ public class Venta {
     }
 
     //CON ATRIBUTOS
-    public Venta(Integer ventaId, String numeroFactura,
-                 Cliente clienteId, Integer usuarioId,
-                 Date fechaVenta, Double total, Boolean estado, String notas) {
+
+
+    public Venta(Integer ventaId, String notas, Boolean estado, Double total, Date fechaVenta, List<Devolucion> devoluciones, List<DetalleVenta> detalleVentas, Usuarios usuarioId, Cliente cliente, String numeroFactura) {
         this.ventaId = ventaId;
-        this.numeroFactura = numeroFactura;
-        this.clienteId = clienteId;
-        this.usuarioId = usuarioId;
-        this.fechaVenta = fechaVenta;
-        this.total = total;
-        this.estado = estado;
         this.notas = notas;
+        this.estado = estado;
+        this.total = total;
+        this.fechaVenta = fechaVenta;
+        this.devoluciones = devoluciones;
+        this.detalleVentas = detalleVentas;
+        this.usuarioId = usuarioId;
+        this.cliente = cliente;
+        this.numeroFactura = numeroFactura;
     }
 
     //GETTERS AND SETTERS
@@ -67,19 +81,13 @@ public class Venta {
         this.numeroFactura = numeroFactura;
     }
 
-    public Cliente getClienteId() {
-        return clienteId;
-    }
 
-    public void setClienteId(Cliente clienteId) {
-        this.clienteId = clienteId;
-    }
 
-    public Integer getUsuarioId() {
+    public Usuarios getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(Integer usuarioId) {
+    public void setUsuarioId(Usuarios usuarioId) {
         this.usuarioId = usuarioId;
     }
 
@@ -121,5 +129,21 @@ public class Venta {
 
     public void setDetalleVentas(List<DetalleVenta> detalleVentas) {
         this.detalleVentas = detalleVentas;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public List<Devolucion> getDevoluciones() {
+        return devoluciones;
+    }
+
+    public void setDevoluciones(List<Devolucion> devoluciones) {
+        this.devoluciones = devoluciones;
     }
 }

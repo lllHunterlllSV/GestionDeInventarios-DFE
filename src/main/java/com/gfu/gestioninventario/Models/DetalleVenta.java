@@ -1,6 +1,8 @@
 package com.gfu.gestioninventario.Models;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "detalle_ventas")
 public class DetalleVenta {
@@ -10,13 +12,18 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "detalleVenta_id")
     private Integer detalleVentaId;
-
+/// relacion venta
     @ManyToOne
     @JoinColumn(name = "venta_id", referencedColumnName = "venta_id", nullable = false) // Relación con Venta
-    private Venta ventaId;
+    private Venta venta;
+/// relacion producto
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
 
-    @Column(name = "producto_id") // Después se agregará la relación con Producto
-    private Integer productoId;
+    ///  relacion devolucion
+    @OneToMany(mappedBy = "detalleVenta")
+    private List<Devolucion> devoluciones;
 
     @Column(name = "cantidad")
     private Integer cantidad;
@@ -30,13 +37,15 @@ public class DetalleVenta {
     }
 
     //CON ATRIBUTOS
-    public DetalleVenta(Integer detalleVentaId, Venta ventaId,
-                        Integer productoId, Integer cantidad, Double precioUnitario) {
+
+
+    public DetalleVenta(Integer detalleVentaId, Double precioUnitario, Integer cantidad, List<Devolucion> devoluciones, Producto producto, Venta venta) {
         this.detalleVentaId = detalleVentaId;
-        this.ventaId = ventaId;
-        this.productoId = productoId;
-        this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
+        this.cantidad = cantidad;
+        this.devoluciones = devoluciones;
+        this.producto = producto;
+        this.venta = venta;
     }
 
     // GETTERS AND SETTERS
@@ -48,20 +57,20 @@ public class DetalleVenta {
         this.detalleVentaId = detalleVentaId;
     }
 
-    public Venta getVentaId() {
-        return ventaId;
+    public Venta getVenta() {
+        return venta;
     }
 
-    public void setVentaId(Venta ventaId) {
-        this.ventaId = ventaId;
+    public void setVenta(Venta venta) {
+        this.venta = venta;
     }
 
-    public Integer getProductoId() {
-        return productoId;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setProductoId(Integer productoId) {
-        this.productoId = productoId;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public Integer getCantidad() {
@@ -78,5 +87,13 @@ public class DetalleVenta {
 
     public void setPrecioUnitario(Double precioUnitario) {
         this.precioUnitario = precioUnitario;
+    }
+
+    public List<Devolucion> getDevoluciones() {
+        return devoluciones;
+    }
+
+    public void setDevoluciones(List<Devolucion> devoluciones) {
+        this.devoluciones = devoluciones;
     }
 }

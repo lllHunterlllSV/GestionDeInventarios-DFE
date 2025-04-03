@@ -12,29 +12,43 @@ public class OrdenCompra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orden_id")
     private Integer ordenId;
-
+/// relacion proveedor
     @ManyToOne
     @JoinColumn(name = "proveedor_id", nullable = false)
-    private Proveedor proveedor;
+    private Proveedores proveedor;
 
     @Column(name = "fecha_orden")
     private Date fechaOrden;
 
     @Column(name = "estado")
     private String estado; // Ej: "Pendiente", "Recibida", "Cancelada"
-
+/// Relacion detalle
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleOrdenCompra> detalles;
+
+    /// Relacion devolucion de compra
+    @OneToMany(mappedBy = "OrdenCompra")
+    private List<DevolucionCompra> devolucionesCompra;
+
+    /// Relacion lote
+    @OneToMany(mappedBy = "orden")
+    private List<Lote> lotes;
 
     // Constructor vacío (requerido por JPA)
     public OrdenCompra() {
     }
 
     // Constructor con parámetros
-    public OrdenCompra(Proveedor proveedor, Date fechaOrden, String estado) {
-        this.proveedor = proveedor;
-        this.fechaOrden = fechaOrden;
+
+
+    public OrdenCompra(Integer ordenId, List<Lote> lotes, List<DevolucionCompra> devolucionesCompra, List<DetalleOrdenCompra> detalles, String estado, Date fechaOrden, Proveedores proveedor) {
+        this.ordenId = ordenId;
+        this.lotes = lotes;
+        this.devolucionesCompra = devolucionesCompra;
+        this.detalles = detalles;
         this.estado = estado;
+        this.fechaOrden = fechaOrden;
+        this.proveedor = proveedor;
     }
 
     // Getters y Setters
@@ -46,11 +60,11 @@ public class OrdenCompra {
         this.ordenId = ordenId;
     }
 
-    public Proveedor getProveedor() {
+    public Proveedores getProveedor() {
         return proveedor;
     }
 
-    public void setProveedor(Proveedor proveedor) {
+    public void setProveedor(Proveedores proveedor) {
         this.proveedor = proveedor;
     }
 
@@ -76,5 +90,21 @@ public class OrdenCompra {
 
     public void setDetalles(List<DetalleOrdenCompra> detalles) {
         this.detalles = detalles;
+    }
+
+    public List<DevolucionCompra> getDevolucionesCompra() {
+        return devolucionesCompra;
+    }
+
+    public void setDevolucionesCompra(List<DevolucionCompra> devolucionesCompra) {
+        this.devolucionesCompra = devolucionesCompra;
+    }
+
+    public List<Lote> getLotes() {
+        return lotes;
+    }
+
+    public void setLotes(List<Lote> lotes) {
+        this.lotes = lotes;
     }
 }

@@ -1,14 +1,12 @@
 package com.gfu.gestioninventario.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.Set;
 
 @Entity
 public class Proveedores {
@@ -44,6 +42,12 @@ public class Proveedores {
     @Size(max = 100, message = "La persona no debe exceder los 100 caracteres")
     @Column(length = 100)
     private String persona;
+
+    @OneToMany(mappedBy = "proveedor")
+    private Set<OrdenCompra> OrdenCompra;
+    @OneToMany (mappedBy = "proveedores")
+    private Set<Producto> Productos;
+
 
     // Getters y setters
 
@@ -103,18 +107,38 @@ public class Proveedores {
         this.persona = persona;
     }
 
+    public Set<OrdenCompra> getOrdenCompra() {
+        return OrdenCompra;
+    }
+
+    public void setOrdenCompra(Set<OrdenCompra> ordenCompra) {
+        OrdenCompra = ordenCompra;
+    }
+
+    public Set<Producto> getProductos() {
+        return Productos;
+    }
+
+    public void setProductos(Set<Producto> productos) {
+        Productos = productos;
+    }
+
     // Constructor sin parámetros
     public Proveedores() {
     }
 
     // Constructor con parámetros
-    public Proveedores(Integer proveedorId, String nombreProveedor, String ncrNit, Integer telefono, String email, String direccion, String persona) {
+
+
+    public Proveedores(Integer proveedorId, Set<Producto> productos, Set<com.gfu.gestioninventario.Models.OrdenCompra> ordenCompra, String persona, String direccion, String email, Integer telefono, String ncrNit, String nombreProveedor) {
         this.proveedorId = proveedorId;
-        this.nombreProveedor = nombreProveedor;
-        this.ncrNit = ncrNit;
-        this.telefono = telefono;
-        this.email = email;
-        this.direccion = direccion;
+        Productos = productos;
+        OrdenCompra = ordenCompra;
         this.persona = persona;
+        this.direccion = direccion;
+        this.email = email;
+        this.telefono = telefono;
+        this.ncrNit = ncrNit;
+        this.nombreProveedor = nombreProveedor;
     }
 }

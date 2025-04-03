@@ -10,15 +10,15 @@ public class DevolucionCompra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "devolucionCompra_id")
     private Integer id;
-
+/// relacion orden de compra
     @ManyToOne
     @JoinColumn(name = "orden_id", nullable = false)
-    private OrdenCompra ordenCompra;
-
+    private OrdenCompra OrdenCompra;
+/// relacion detalle orden de compra
     @ManyToOne
     @JoinColumn(name = "detalle_id", nullable = false)
     private DetalleOrdenCompra detalleOrdenCompra;
-
+/// Relacion usuario
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuarios usuario;
@@ -36,18 +36,19 @@ public class DevolucionCompra {
     @Column(name = "estado", nullable = false, length = 50)
     private String estado;
 
-    public DevolucionCompra(Integer id, OrdenCompra ordenCompra, DetalleOrdenCompra detalleOrdenCompra, Usuarios usuario, Integer cantidad, String motivo, Date fechaDevolucion, String estado) {
-        this.id = id;
-        this.ordenCompra = ordenCompra;
-        this.detalleOrdenCompra = detalleOrdenCompra;
-        this.usuario = usuario;
-        this.cantidad = cantidad;
-        this.motivo = motivo;
-        this.fechaDevolucion = fechaDevolucion;
-        this.estado = estado;
-    }
 
     public DevolucionCompra() {}
+
+    public DevolucionCompra(Integer id, String estado, Date fechaDevolucion, String motivo, Integer cantidad, Usuarios usuario, DetalleOrdenCompra detalleOrdenCompra, com.gfu.gestioninventario.Models.OrdenCompra ordenCompra) {
+        this.id = id;
+        this.estado = estado;
+        this.fechaDevolucion = fechaDevolucion;
+        this.motivo = motivo;
+        this.cantidad = cantidad;
+        this.usuario = usuario;
+        this.detalleOrdenCompra = detalleOrdenCompra;
+        OrdenCompra = ordenCompra;
+    }
 
     public Integer getId() {
         return id;
@@ -58,11 +59,11 @@ public class DevolucionCompra {
     }
 
     public OrdenCompra getOrdenCompra() {
-        return ordenCompra;
+        return OrdenCompra;
     }
 
     public void setOrdenCompra(OrdenCompra ordenCompra) {
-        this.ordenCompra = ordenCompra;
+        OrdenCompra = ordenCompra;
     }
 
     public DetalleOrdenCompra getDetalleOrdenCompra() {
