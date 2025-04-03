@@ -20,8 +20,9 @@ public class OrdenCompra {
     @Column(name = "fecha_orden")
     private Date fechaOrden;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private String estado; // Ej: "Pendiente", "Recibida", "Cancelada"
+    private EstadoOrden estado; // Ej: "Pendiente", "Recibida", "Cancelada"
 /// Relacion detalle
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleOrdenCompra> detalles;
@@ -41,14 +42,14 @@ public class OrdenCompra {
     // Constructor con parámetros
 
 
-    public OrdenCompra(Integer ordenId, List<Lote> lotes, List<DevolucionCompra> devolucionesCompra, List<DetalleOrdenCompra> detalles, String estado, Date fechaOrden, Proveedores proveedor) {
+    public OrdenCompra(Integer ordenId, Proveedores proveedor, Date fechaOrden, EstadoOrden estado, List<DetalleOrdenCompra> detalles, List<DevolucionCompra> devolucionesCompra, List<Lote> lotes) {
         this.ordenId = ordenId;
-        this.lotes = lotes;
-        this.devolucionesCompra = devolucionesCompra;
-        this.detalles = detalles;
-        this.estado = estado;
-        this.fechaOrden = fechaOrden;
         this.proveedor = proveedor;
+        this.fechaOrden = fechaOrden;
+        this.estado = estado;
+        this.detalles = detalles;
+        this.devolucionesCompra = devolucionesCompra;
+        this.lotes = lotes;
     }
 
     // Getters y Setters
@@ -76,11 +77,11 @@ public class OrdenCompra {
         this.fechaOrden = fechaOrden;
     }
 
-    public String getEstado() {
+    public EstadoOrden getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoOrden estado) {
         this.estado = estado;
     }
 
