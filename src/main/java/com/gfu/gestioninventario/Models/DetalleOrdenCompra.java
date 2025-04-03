@@ -1,4 +1,4 @@
-package Models;
+package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
 
