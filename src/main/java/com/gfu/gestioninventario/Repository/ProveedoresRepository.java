@@ -2,9 +2,6 @@ package com.gfu.gestioninventario.Repository;
 
 import com.gfu.gestioninventario.Models.Proveedores;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface ProveedoresRepository extends JpaRepository<Proveedores, Integer> {
 
