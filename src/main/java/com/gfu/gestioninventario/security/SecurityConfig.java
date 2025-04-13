@@ -13,11 +13,13 @@ import com.gfu.gestioninventario.Services.CustomUserDetailsService;
 @Configuration
 public class SecurityConfig {
     
+    //ENCRIPTADOR Y COMPARADOR DE CONTRASE;A
     @Bean
     public PasswordEncoder PasswordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    //AUTENTICACION DEL LOGIN
     @Bean
     public DaoAuthenticationProvider authProvider(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -26,6 +28,7 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    //DEFINE LAS AUTORIZACIONES DE ACCESO
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
