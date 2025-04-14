@@ -22,8 +22,8 @@ public class Usuarios {
     private String nombreCompleto;
     @Column(name="email")
     private String email;
-    @Column(name="created_at")
-    private Date created_at;
+    @Column (name = "estado")
+    private String estado;
 
     /// mapeo a tabla roles
   @ManyToOne(fetch = FetchType.EAGER)
@@ -49,31 +49,25 @@ public class Usuarios {
     public Usuarios() {
     }
 
-    public Usuarios(List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, Date created_at, String email, String nombreCompleto, String usuario, Integer usuario_id, String contrasena) {
+    public Usuarios(Integer usuario_id, List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, String estado, String nombreCompleto, String email, String contrasena, String usuario) {
+        this.usuario_id = usuario_id;
         this.devolucionCompra = devolucionCompra;
         this.devoluciones = devoluciones;
         this.ventas = ventas;
         this.controlMovimientosSet = controlMovimientosSet;
         this.roles = roles;
-        this.created_at = created_at;
-        this.email = email;
+        this.estado = estado;
         this.nombreCompleto = nombreCompleto;
-        this.usuario = usuario;
-        this.usuario_id = usuario_id;
+        this.email = email;
         this.contrasena = contrasena;
+        this.usuario = usuario;
     }
 
     /// getters y setters
     ///
 
 
-    public Date getCreated_at() {
-        return created_at;
-    }
 
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
 
     public String getEmail() {
         return email;
@@ -153,5 +147,13 @@ public class Usuarios {
 
     public void setControlMovimientosSet(Set<ControlMovimientos> controlMovimientosSet) {
         this.controlMovimientosSet = controlMovimientosSet;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
