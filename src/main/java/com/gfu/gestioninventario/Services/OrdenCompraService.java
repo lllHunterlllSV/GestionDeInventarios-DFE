@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrdenCompraService {
@@ -50,8 +48,20 @@ public class OrdenCompraService {
         
         // Configurar valores iniciales
         ordenCompra.setFechaOrden(new Date());
+        if (ordenCompra.getEstado() != null && ordenCompra.getEstado() != EstadoOrden.PENDIENTE) {
+            throw new IllegalArgumentException("No se puede crear una orden con estado diferente a PENDIENTE.");
+        }
+
         ordenCompra.setEstado(EstadoOrden.PENDIENTE);
-        
+        Set<Integer> productosUnicos = new HashSet<>();
+        for (DetalleOrdenCompra d : detalles) {
+            if (!productosUnicos.add(d.getProducto().getProductoId())) {
+                throw new IllegalArgumentException("El producto con ID " + d.getProducto().getProductoId() + " está duplicado en los detalles.");
+            }
+        }
+
+
+
         // Guardar la orden principal
         OrdenCompra ordenGuardada = ordenCompraRepository.save(ordenCompra);
         
@@ -112,7 +122,13 @@ public class OrdenCompraService {
         if(orden.getEstado() == EstadoOrden.CANCELADO) {
             throw new IllegalStateException("No se puede modificar una orden cancelada");
         }
-        
+        if (orden.getEstado() == EstadoOrden.RECIBIDO && nuevoEstado != EstadoOrden.RECIBIDO) {
+            throw new IllegalArgumentException("No se puede modificar una orden ya recibida.");
+        }
+        if (detalleOrdenCompraRepository.findByOrden(orden).isEmpty()) {
+            throw new IllegalStateException("No se puede recibir una orden sin detalles.");
+        }
+
         if(nuevoEstado == EstadoOrden.RECIBIDO && orden.getEstado() == EstadoOrden.PENDIENTE) {
             // Al recibir la orden, crear los lotes correspondientes
             crearLotesParaOrden(orden);
@@ -158,15 +174,27 @@ public class OrdenCompraService {
      */
     private void crearLotesParaOrden(OrdenCompra orden) {
         List<DetalleOrdenCompra> detalles = detalleOrdenCompraRepository.findByOrden(orden);
-        
-        for(DetalleOrdenCompra detalle : detalles) {
+        for (DetalleOrdenCompra detalle : detalles) {
+            boolean existe = loteRepository.existsByProductoProductoIdAndOrdenCompraOrdenId(
+                    detalle.getProducto().getProductoId(),
+                    orden.getOrdenId()
+            );
+
+            if (existe) {
+                throw new IllegalArgumentException("Ya existe un lote para el producto con ID "
+                        + detalle.getProducto().getProductoId() + " en esta orden.");
+            }
+
+
+
+            // Si no existe, lo crea
             Lote lote = new Lote();
             lote.setOrden(orden);
             lote.setProducto(detalle.getProducto());
             lote.setCantidad(detalle.getCantidad());
             lote.setCostoUnitario(detalle.getPrecioUnitario());
             lote.setFechaIngreso(new Date());
-            
+            lote.setEstado(true);
             // Para productos perecederos, podríamos calcular una fecha de vencimiento
             // Aquí un ejemplo simple (30 días después)
             // En un sistema real, esto debería basarse en las características del producto
