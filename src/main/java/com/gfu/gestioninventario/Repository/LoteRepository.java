@@ -7,4 +7,5 @@ import java.util.List;
 public interface LoteRepository extends JpaRepository<Lote, Integer> {
     List<Lote> findByProductoProductoId(Integer productoId);
     List<Lote> findByEstadoTrue();
+    boolean existsByProductoProductoIdAndOrdenCompraOrdenId(Integer productoId, Integer ordenId);
 }

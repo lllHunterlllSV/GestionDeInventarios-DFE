@@ -2,6 +2,7 @@ package com.gfu.gestioninventario.Services;
 
 import com.gfu.gestioninventario.Models.Lote;
 import com.gfu.gestioninventario.Repository.LoteRepository;
+import com.gfu.gestioninventario.Repository.OrdenCompraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class LoteService {
         if(lote.getCostoUnitario() <= 0) {
             throw new IllegalArgumentException("El costo unitario debe ser mayor que cero");
         }
+
         
         return loteRepository.save(lote);
     }
