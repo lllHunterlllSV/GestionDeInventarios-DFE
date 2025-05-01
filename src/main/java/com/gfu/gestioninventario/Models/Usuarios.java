@@ -2,9 +2,9 @@ package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 
 @Entity
 @Table(name = "usuarios")
@@ -22,11 +22,12 @@ public class Usuarios {
     private String nombreCompleto;
     @Column(name="email")
     private String email;
-    @Column (name = "estado")
-    private String estado;
+    @Column(name="estado")
+    private boolean estado;
 
     /// mapeo a tabla roles
   @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "rol_id")
   private Roles roles;
 
   /// mapeo a tabla control de movimiento
@@ -49,7 +50,7 @@ public class Usuarios {
     public Usuarios() {
     }
 
-    public Usuarios(Integer usuario_id, List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, String estado, String nombreCompleto, String email, String contrasena, String usuario) {
+    public Usuarios(Integer usuario_id, List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, boolean estado, String nombreCompleto, String email, String contrasena, String usuario) {
         this.usuario_id = usuario_id;
         this.devolucionCompra = devolucionCompra;
         this.devoluciones = devoluciones;
@@ -149,11 +150,11 @@ public class Usuarios {
         this.controlMovimientosSet = controlMovimientosSet;
     }
 
-    public String getEstado() {
+    public Boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 }
