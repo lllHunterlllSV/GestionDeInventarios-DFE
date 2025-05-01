@@ -1,6 +1,7 @@
 package com.gfu.gestioninventario.Repository;
 
 import com.gfu.gestioninventario.Models.Proveedores;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProveedoresRepository extends JpaRepository<Proveedores, Integer> {
@@ -10,10 +11,8 @@ public interface ProveedoresRepository extends JpaRepository<Proveedores, Intege
 
     /// Busca proveedores por id
     Proveedores findById(int id);
-    /// Buscar por NIT
-    Proveedores findbyNCR(String ncr);
 
-
+    Proveedores findByNcrNit(String ncrNit);
 
 
 

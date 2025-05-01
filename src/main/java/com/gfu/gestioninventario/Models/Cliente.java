@@ -35,7 +35,7 @@ public class Cliente {
     private Boolean estado;
 
     @Column(name = "telefono")
-    private String telefono;
+    private Integer telefono;
 
     @Column(name = "email")
     private String email;
@@ -47,16 +47,16 @@ public class Cliente {
     //CON ATRIBUTOS
 
 
-    public Cliente(Integer clienteId, String email, String telefono, Boolean estado, String DUI, String NIF, List<Venta> ventas, TipoCliente tipoCliente, String nombreCliente) {
+    public Cliente(Integer clienteId, String nombreCliente, TipoCliente tipoCliente, String NIF, List<Venta> ventas, String DUI, Boolean estado, Integer telefono, String email) {
         this.clienteId = clienteId;
-        this.email = email;
-        this.telefono = telefono;
-        this.estado = estado;
-        this.DUI = DUI;
+        this.nombreCliente = nombreCliente;
+        this.tipoCliente = tipoCliente;
         this.NIF = NIF;
         this.ventas = ventas;
-        this.tipoCliente = tipoCliente;
-        this.nombreCliente = nombreCliente;
+        this.DUI = DUI;
+        this.estado = estado;
+        this.telefono = telefono;
+        this.email = email;
     }
 
     //GETTERS AND SETTERS
@@ -99,12 +99,15 @@ public class Cliente {
     public void setEstado(Boolean estado) {
         this.estado = estado;
     }
-    public String getTelefono() {
+
+    public Integer getTelefono() {
         return telefono;
     }
-    public void setTelefono(String telefono) {
+
+    public void setTelefono(Integer telefono) {
         this.telefono = telefono;
     }
+
     public String getEmail() {
         return email;
     }

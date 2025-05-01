@@ -48,9 +48,16 @@ public class ProveedoresService {
         if (proveedorId == null || !proveedoresRepository.existsById(proveedorId)) {
             throw new RuntimeException("El proveedor no existe");
         }
+        /*
 
         if (ordenCompraRepository.existsByIdAndEstado(proveedorId, EstadoOrden.PENDIENTE)) {
             throw new RuntimeException("No se puede eliminar el proveedor con órdenes pendientes");
+        }
+        */
+
+        if(ordenCompraRepository.existsByProveedor_ProveedorIdAndEstado(proveedorId,EstadoOrden.PENDIENTE)){
+            throw new RuntimeException("No se puede eliminar el proveedor con órdenes pendientes");
+
         }
 
         proveedoresRepository.deleteById(proveedorId);

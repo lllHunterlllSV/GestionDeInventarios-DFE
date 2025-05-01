@@ -13,7 +13,8 @@ import com.gfu.gestioninventario.Repository.UsuariosRepository;
 
 @SpringBootApplication
 public class TestLogin implements CommandLineRunner{
-    
+
+
     @Autowired
     private UsuariosRepository usuariosRepository;
 
@@ -43,5 +44,9 @@ public class TestLogin implements CommandLineRunner{
                 
             }
         }
+
+
     }
+
+
 }
