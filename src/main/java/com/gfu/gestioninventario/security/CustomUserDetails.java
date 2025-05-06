@@ -1,4 +1,5 @@
 package com.gfu.gestioninventario.security;
+/*
 import com.gfu.gestioninventario.Models.Usuarios;
 
 import java.util.Collection;
@@ -7,6 +8,7 @@ import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 
 public class CustomUserDetails implements UserDetails {
     private final Usuarios usuario;
@@ -51,3 +53,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
+*/

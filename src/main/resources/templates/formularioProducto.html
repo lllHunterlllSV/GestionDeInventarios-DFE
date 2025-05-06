@@ -1,0 +1,202 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formulario de Ingreso de Productos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+          rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+
+
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4" th:attr="data-exito=${exito}, data-error=${error}">
+<form id="formProducto"
+      th:action="@{/productos/guardarProducto}"
+      th:object="${producto}"
+      method="post"
+      class="bg-white shadow-md rounded-lg max-w-lg w-full p-8 space-y-6">
+
+
+
+  <input type="hidden" th:field="*{productoId}">
+  <div class="mb-4">
+    <a type="button" th:href="@{/productos/categorias}" aria-label="Volver atrás"
+            class="text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+      <i class="fas fa-arrow-left fa-lg"></i>
+    </a>
+  </div>
+  <h1 class="text-2xl font-semibold text-gray-800 text-center">
+    <span th:text="*{productoId} != null ? 'Editar Producto' : 'Ingresar Nuevo Producto'"></span>
+  </h1>
+
+  <div>
+    <label
+            for="nombre"
+            class="block text-gray-700 font-medium mb-1"
+    >Nombre del Producto</label
+    >
+
+
+    <input
+            type="text"
+            id="nombre"
+            th:field="*{nombre}"
+            required
+            placeholder="Ejemplo: Camisa de algodón"
+            class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  <div>
+    <label
+            for="descripcion"
+            class="block text-gray-700 font-medium mb-1"
+
+    >Descripción</label
+    >
+    <textarea
+            id="descripcion"
+            th:field="*{descripcion}"
+            rows="3"
+            placeholder="Descripción detallada del producto"
+            class="w-full border border-gray-300 rounded-md px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+    ></textarea>
+  </div>
+
+  <!-- CATEGORÍA -->
+  <div class="mb-4">
+    <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
+    <select th:field="*{categoria.id}"
+            class="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <option value="" disabled selected>Seleccione una Categoria</option>
+      <option th:each="categoria : ${categorias}"
+              th:value="${categoria.id}"
+              th:text="${categoria.nombre}">Selecciona una categoría</option>
+    </select>
+
+    <!-- Botón para mostrar input nueva categoría -->
+    <button
+            type="button"
+            id="btnAgregarCategoria"
+            class="mt-2 inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold focus:outline-none"
+    >
+      <i class="fas fa-plus"></i> Agregar Categoría
+    </button>
+
+    <!-- Campo para nueva categoría (inicialmente oculto) -->
+    <div id="nuevaCategoriaContainer" class="mt-3 hidden">
+      <input
+              type="text"
+              id="nuevaCategoria"
+              name="nuevaCategoria"
+              placeholder="Ingrese nueva categoría"
+              class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+              type="button"
+              id="btnCancelarCategoria"
+              class="mt-2 text-sm text-red-600 hover:text-red-800 font-semibold focus:outline-none"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+
+  <!-- PROVEEDOR -->
+  <div class="mb-4">
+    <label class="block text-gray-700 font-semibold mb-1">Proveedor</label>
+    <select th:field="*{proveedores.proveedorId}"
+            class="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <option value="" disabled selected>Seleccione un proveedor</option>
+      <option th:each="p : ${proveedores}"
+              th:value="${p.proveedorId}"
+              th:text="${p.nombreProveedor}"></option>
+    </select>
+  </div>
+  <div>
+    <a
+            class="mt-2 inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold focus:outline-none"
+            th:href="@{/proveedores/form}"
+    >
+      <i class="fas fa-plus"></i> Agregar Proveedor
+    </a>
+
+  </div>
+
+  <!-- UNIDAD DE MEDIDA -->
+  <div class="mb-4">
+    <label class="block text-gray-700 font-semibold mb-1">Unidad de Medida</label>
+    <select th:field="*{medidas.medidaId}"
+            class="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <option value="" disabled selected> Seleccione una Medida</option>
+      <option th:each="medida : ${medidas}"
+              th:value="${medida.medidaId}"
+              th:text="${medida.medida}"></option>
+    </select>
+  </div>
+
+
+
+  <button type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition-colors duration-300" onClick="confirmarEnvioProd()">
+    <i class="fas" th:classappend="*{productoId} != null ? 'fa-save' : 'fa-plus-circle'"></i>
+    <span th:text="*{productoId} != null ? 'Guardar Cambios' : 'Agregar Producto'"></span>
+  </button>
+</form>
+
+<script>
+  const btnAgregarCategoria = document.getElementById('btnAgregarCategoria');
+  const nuevaCategoriaContainer = document.getElementById('nuevaCategoriaContainer');
+  const btnCancelarCategoria = document.getElementById('btnCancelarCategoria');
+  const categoriaSelect = document.getElementById('categoria');
+  const nuevaCategoriaInput = document.getElementById('nuevaCategoria');
+
+  btnAgregarCategoria.addEventListener('click', () => {
+    nuevaCategoriaContainer.classList.remove('hidden');
+    btnAgregarCategoria.classList.add('hidden');
+    nuevaCategoriaInput.focus();
+    categoriaSelect.disabled = true;
+  });
+
+  btnCancelarCategoria.addEventListener('click', () => {
+    nuevaCategoriaContainer.classList.add('hidden');
+    btnAgregarCategoria.classList.remove('hidden');
+    nuevaCategoriaInput.value = '';
+    categoriaSelect.disabled = false;
+  });
+
+  const btnAgregarProveedor = document.getElementById('btnAgregarProveedor');
+  const nuevoProveedorContainer = document.getElementById('nuevoProveedorContainer');
+  const btnCancelarProveedor = document.getElementById('btnCancelarProveedor');
+  const proveedorSelect = document.getElementById('proveedor');
+  const nuevoProveedorInput = document.getElementById('nuevoProveedor');
+
+  btnAgregarProveedor.addEventListener('click', () => {
+    nuevoProveedorContainer.classList.remove('hidden');
+    btnAgregarProveedor.classList.add('hidden');
+    nuevoProveedorInput.focus();
+    proveedorSelect.disabled = true;
+  });
+
+  btnCancelarProveedor.addEventListener('click', () => {
+    nuevoProveedorContainer.classList.add('hidden');
+    btnAgregarProveedor.classList.remove('hidden');
+    nuevoProveedorInput.value = '';
+    proveedorSelect.disabled = false;
+  });
+</script>
+<script src="/js/sweetAlert.js"></script>
+</body>
+</html>

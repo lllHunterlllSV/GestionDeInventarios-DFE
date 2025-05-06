@@ -1,0 +1,86 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrar Proveedor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+          rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4" th:attr="data-exito=${exito}, data-error=${error}">
+<form th:action="@{/proveedores/guardarProveedor}" th:object="${proveedores}" method="post" class="bg-white shadow-md rounded-lg p-8 max-w-lg w-full relative">
+
+  <input type="hidden" th:field="*{proveedorId}" />
+  <a type="button" th:href="@{/proveedores/lista}" aria-label="Volver atrás" class="absolute top-4 left-4 text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+    <i class="fas fa-arrow-left fa-lg"></i>
+  </a>
+  <h1 class="text-2xl font-semibold mb-6 text-gray-800 text-center">Registrar Proveedor</h1>
+  <div th:if="${error}"
+       class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-[1.01]">
+    <span th:text="${error}"></span>
+  </div>
+
+
+  <div class="mb-4">
+    <label for="nombreProveedor" class="block text-gray-700 font-medium mb-1">Nombre del Proveedor <span class="text-red-600">*</span></label>
+    <input type="text" id="nombreProveedor" name="nombreProveedor" th:field="*{nombreProveedor}" maxlength="100" required
+           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <p th:if="${#fields.hasErrors('nombreProveedor')}" th:errors="*{nombreProveedor}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <div class="mb-4">
+    <label for="ncrNit" class="block text-gray-700 font-medium mb-1">NCR/NIT</label>
+    <input type="text" id="ncrNit" name="ncrNit" th:field="*{ncrNit}" maxlength="25"
+           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <p th:if="${#fields.hasErrors('ncrNit')}" th:errors="*{ncrNit}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <div class="mb-4">
+    <label for="telefono" class="block text-gray-700 font-medium mb-1">Teléfono <span class="text-red-600">*</span></label>
+    <input type="number" id="telefono" name="telefono" th:field="*{telefono}" required
+           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <p th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <div class="mb-4">
+    <label for="email" class="block text-gray-700 font-medium mb-1">Email <span class="text-red-600">*</span></label>
+    <input type="email" id="email" name="email" th:field="*{email}" maxlength="100" required
+           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <div class="mb-4">
+    <label for="direccion" class="block text-gray-700 font-medium mb-1">Dirección <span class="text-red-600">*</span></label>
+    <textarea id="direccion" name="direccion" th:field="*{direccion}" maxlength="150" required rows="3"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <p th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <div class="mb-6">
+    <label for="persona" class="block text-gray-700 font-medium mb-1">Persona de Contacto</label>
+    <input type="text" id="persona" name="persona" th:field="*{persona}" maxlength="100"
+           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    <p th:if="${#fields.hasErrors('persona')}" th:errors="*{persona}" class="text-red-600 text-sm mt-1"></p>
+  </div>
+
+  <button type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition-colors duration-300" onClick="confirmarEnvio()">
+    Guardar Proveedor
+  </button>
+</form>
+
+<script src="/js/sweetAlert.js"></script>
+</body>
+</html>

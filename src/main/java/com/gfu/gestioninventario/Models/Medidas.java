@@ -7,10 +7,12 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
+@Table(name = "medidas")
 public class Medidas {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Esto indica que el medida_id es autoincremental
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medida_id")// Esto indica que el medida_id es autoincremental
     private Integer medidaId;
 
     @Column(nullable = false, length = 30)

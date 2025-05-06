@@ -1,6 +1,7 @@
 package com.gfu.gestioninventario.Models;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class DetalleVenta {
     private Integer cantidad;
 
     @Column(name = "precio_unitario")
-    private Double precioUnitario;
+    private BigDecimal precioUnitario;
 
     //CONSTRUCTORES
     //DEFAULT
@@ -39,7 +40,7 @@ public class DetalleVenta {
     //CON ATRIBUTOS
 
 
-    public DetalleVenta(Integer detalleVentaId, Double precioUnitario, Integer cantidad, List<Devolucion> devoluciones, Producto producto, Venta venta) {
+    public DetalleVenta(Integer detalleVentaId, BigDecimal precioUnitario, Integer cantidad, List<Devolucion> devoluciones, Producto producto, Venta venta) {
         this.detalleVentaId = detalleVentaId;
         this.precioUnitario = precioUnitario;
         this.cantidad = cantidad;
@@ -81,11 +82,11 @@ public class DetalleVenta {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecioUnitario() {
+    public BigDecimal getPrecioUnitario() {
         return precioUnitario;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
     }
 

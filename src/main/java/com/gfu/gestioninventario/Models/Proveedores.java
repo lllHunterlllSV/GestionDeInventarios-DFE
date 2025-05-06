@@ -9,19 +9,21 @@ import jakarta.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
+@Table(name = "proveedores")
 public class Proveedores {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="proveedor_id")
     private Integer proveedorId;
 
     @NotBlank(message = "El nombre del proveedor no puede estar vacío")
     @Size(max = 100, message = "El nombre del proveedor no debe exceder los 100 caracteres")
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombreProveedor", nullable = false, length = 100)
     private String nombreProveedor;
 
     @Size(max = 25, message = "El NCR/NIT no debe exceder los 25 caracteres")
-    @Column(length = 25)
+    @Column(name="NCR_NIT", length = 25)
     private String ncrNit;
 
     @NotNull(message = "El teléfono no puede ser nulo")

@@ -5,13 +5,17 @@ import com.gfu.gestioninventario.Models.Proveedores;
 import com.gfu.gestioninventario.Repository.OrdenCompraRepository;
 import com.gfu.gestioninventario.Repository.ProveedoresRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProveedoresService {
+public class ProveedoresService implements ProveedoresServiceInt{
     @Autowired
     private ProveedoresRepository proveedoresRepository;
     @Autowired
@@ -40,6 +44,12 @@ public class ProveedoresService {
 
     }
 
+    public boolean existeProveedor(String ncrNit,String persona, String email,
+                                   Integer telefono, String nombreProveedor) {
+        return proveedoresRepository.ExisteProveedores(ncrNit,persona,email,telefono,nombreProveedor);
+
+    }
+
     public void modificarProveedor(Proveedores proveedor) {
         proveedoresRepository.save(proveedor);
     }
@@ -48,12 +58,8 @@ public class ProveedoresService {
         if (proveedorId == null || !proveedoresRepository.existsById(proveedorId)) {
             throw new RuntimeException("El proveedor no existe");
         }
-        /*
 
-        if (ordenCompraRepository.existsByIdAndEstado(proveedorId, EstadoOrden.PENDIENTE)) {
-            throw new RuntimeException("No se puede eliminar el proveedor con órdenes pendientes");
-        }
-        */
+
 
         if(ordenCompraRepository.existsByProveedor_ProveedorIdAndEstado(proveedorId,EstadoOrden.PENDIENTE)){
             throw new RuntimeException("No se puede eliminar el proveedor con órdenes pendientes");
@@ -64,6 +70,13 @@ public class ProveedoresService {
     }
 
 
+    @Override
+    public Page<Proveedores> findAll(Pageable pageable) {
+        return proveedoresRepository.findAll(pageable);
+    }
 
-
+    @Override
+    public Page<Proveedores> buscarPorKeyword(String keyword, Pageable pageable) {
+        return proveedoresRepository.buscarPorKeyword(keyword, pageable);
+    }
 }
