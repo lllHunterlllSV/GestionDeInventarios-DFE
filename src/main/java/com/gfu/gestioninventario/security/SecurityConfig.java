@@ -1,5 +1,5 @@
 package com.gfu.gestioninventario.security;
-
+/*
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,3 +49,4 @@ public class SecurityConfig {
             return http.build();
     }
 }
+*/

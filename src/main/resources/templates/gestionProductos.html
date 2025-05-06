@@ -1,0 +1,270 @@
+<html lang="es" class="scroll-smooth" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title th:text="${title} + ' - App de Gestión de Inventario'">App de Gestión de Inventario</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col" th:attr="data-exito=${exito}, data-error=${error}">
+<div class="flex flex-1 min-h-0">
+  <!-- Sidebar -->
+  <div th:insert="~{fragments/fragmentoSidebar :: sidebar}"></div>
+
+  <!-- Main content -->
+  <div class="flex flex-col flex-1 md:pl-64 min-h-screen">
+    <!-- Topbar -->
+    <div th:insert="~{fragments/fragmentoNavbar :: navbar}"></div>
+
+    <!-- Gestión de productos -->
+    <section class="mb-12 px-4" id="gestion-productos">
+
+
+      <div class="mt-10 text-center mb-6">
+        <h3 class="text-2xl font-semibold text-gray-800">
+          Gestión de Productos
+        </h3>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mt-10 mx-auto w-full max-w-8xl">
+        <div class="mb-4">
+          <button type="button" onclick="history.back()" aria-label="Volver atrás"
+                  class="text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+            <i class="fas fa-arrow-left fa-lg"></i>
+          </button>
+        </div>
+
+
+        <!-- Search and Add New Product -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
+
+
+          <form id="filtroForm" th:action="@{/productos/productosCat/{id}(id=${categoria.id})}"
+                method="get"  class="flex flex-col sm:flex-row gap-2 sm:items-center w-full sm:w-full" role="search">
+
+            <div class="relative w-full sm:w-1/2">
+              <input type="search"
+                     name="keyword"
+                     placeholder="Buscar por ID, nombre o categoría..."
+                     aria-label="Buscar producto"
+                     class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-green-500 text-gray-700"
+                     th:value="${keyword}"/>
+              <span class="absolute left-3 top-2.5 text-gray-400">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+
+            <!-- Select de orden -->
+            <div>
+              <select name="sortField" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="enviarFormulario()" th:value="${sortField}">
+                <option value="productoId">Ordenar por ID</option>
+                <option value="nombre">Ordenar por Nombre</option>
+
+              </select>
+            </div>
+
+            <div>
+              <select name="sortDir" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="enviarFormulario()"  th:value="${sortDir}">
+                <option value="asc">Ascendente</option>
+                <option value="desc">Descendente</option>
+              </select>
+            </div>
+
+            <input type="hidden" name="size" th:value="${size}">
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow focus:ring-green-500">
+              <i class="fas fa-search mr-2"></i> Buscar
+            </button>
+            <button type="button"
+                    th:onclick="'window.location.href=\'/productos/productosCat/' + ${categoria.id} + '\';'"
+                    class="inline-flex items-center px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg shadow focus:ring-gray-400">
+              <i class="fas fa-undo mr-2"></i> Limpiar
+            </button>
+
+          </form>
+
+
+        </div>
+
+        <!-- Info de paginación -->
+        <div class="mb-4 text-sm text-gray-600">
+          Mostrando
+          <span th:text="${productos.totalElements == 0 ? 0 : (paginaActual * size) + 1}">1</span> a
+          <span th:text="${(productos.number * productos.size) + productos.numberOfElements}">5</span> de
+          <span th:text="${productos.totalElements}">total</span> productos
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <strong>Error:</strong> <span th:text="${error}"></span>
+        </div>
+
+        <table id="productsTable" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-green-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">ID</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Nombre</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Descripción</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Categoría</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Proveedor</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Medida</th>
+
+          </tr>
+          </thead>
+
+          <!-- Empty State -->
+          <tbody class="divide-y divide-gray-100" th:if="${productos.totalElements == 0}">
+          <tr>
+            <td colspan="7" class="px-4 py-6 text-center text-gray-500 text-sm">
+              No se encontraron productos <span th:if="${keyword}" th:text="'con el término: ' + ${keyword}"></span>
+            </td>
+          </tr>
+          </tbody>
+
+          <!-- Products List -->
+          <tbody class="divide-y divide-gray-100" th:unless="${productos.totalElements == 0}">
+          <tr class="hover:bg-green-50" th:each="producto : ${productos.content}">
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.productoId}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.nombre}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${#strings.abbreviate(producto.descripcion, 30)}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.categoria.nombre}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.proveedores.nombreProveedor}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.medidas.medida}"></td>
+            <td class="px-4 py-2 text-center space-x-2">
+              <a th:href="@{/productos/editar/{id}(id=${producto.productoId})}"
+                 class="text-green-600 hover:text-green-800 focus:outline-none">
+                <i class="fas fa-edit"></i>
+              </a>
+              <form th:action="@{/productos/eliminar/{id}(id=${producto.productoId})}" method="post" class="inline" >
+
+
+
+                <button type="button" th:attr="data-nombre=${producto.nombre}"
+                        class="text-red-600 hover:text-red-800 focus:outline-none"  onclick="confirmarEliminarProd(this.form)"
+                        onsubmit="return false;">
+
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between mt-6 pt-4 border-t border-gray-200">
+          <!-- Page Size Selector -->
+          <div class="mb-4 sm:mb-0">
+            <span class="text-sm text-gray-700 mr-2">Mostrar:</span>
+            <select class="border rounded px-2 py-1 text-sm" onchange="location = this.value;">
+              <option th:each="s : ${sizeOptions}"
+                      th:value="@{/productos/productosCat/{id}(id=${categoria.id}, size=${s}, page=0, keyword=${keyword}, sortField=${sortField}, sortDir=${sortDir})}"
+                      th:text="${s}"
+                      th:selected="${productos.size == s}">
+              </option>
+            </select>
+
+            <span class="text-sm text-gray-700 ml-2">registros</span>
+          </div>
+
+          <!-- Pagination Navigation -->
+          <nav aria-label="Paginación">
+            <ul class="inline-flex items-center -space-x-px">
+              <!-- Previous Button -->
+              <li>
+                <a th:href="@{/productos/productosCat/{id}(id=${categoria.id}, page=${productos.number - 1}, size=${productos.size}, keyword=${keyword}, sortField=${sortField}, sortDir=${sortDir})}"
+                   class="block px-3 py-2 ml-0 rounded-l-lg border border-gray-300 bg-white hover:bg-green-50"
+                   th:classappend="${productos.first} ? 'pointer-events-none opacity-50' : ''">
+                  <span class="sr-only">Anterior</span>
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+
+              </li>
+
+              <!-- Page Numbers -->
+              <li th:each="i : ${#numbers.sequence(1, productos.totalPages)}">
+                <a th:href="@{/productos/productosCat/{id}(id=${categoria.id}, page=${i - 1}, size=${productos.size}, keyword=${keyword}, sortField=${sortField}, sortDir=${sortDir})}"
+                   th:text="${i}"
+                   class="px-3 py-2 border"
+                   th:class="${(i - 1) == productos.number} ?
+               'bg-green-600 text-white border-green-600' :
+               'bg-white border-gray-300 hover:bg-green-50'">
+                </a>
+              </li>
+
+
+              <!-- Next Button -->
+              <li>
+                <a th:href="@{/productos/productosCat/{id}(id=${categoria.id}, page=${productos.number + 1}, size=${productos.size}, keyword=${keyword}, sortField=${sortField}, sortDir=${sortDir})}"
+                   class="block px-3 py-2 rounded-r-lg border border-gray-300 bg-white hover:bg-green-50"
+                   th:classappend="${productos.last} ? 'pointer-events-none opacity-50' : ''">
+                  <span class="sr-only">Siguiente</span>
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+
+
+              </li>
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+<div id="addProductModal" class="fixed inset-0 flex items-center justify-center p-4 hidden z-50" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <!-- Contenido del modal se mantiene igual -->
+</div>
+
+<script>
+  // Script del modal
+  const openModalBtn = document.getElementById('openModalBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const modal = document.getElementById('addProductModal');
+  const backdrop = document.getElementById('modalBackdrop');
+
+  function openModal() {
+    modal.classList.remove('hidden');
+    backdrop.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    backdrop.classList.add('hidden');
+  }
+
+  function resetBusqueda() {
+    window.location.href = '/productos/lista';
+  }
+
+  function confirmarEliminacion(button) {
+    const nombre = button.getAttribute('data-nombre');
+    return confirm(`¿Está seguro de eliminar el producto "${nombre}"?`);
+  }
+
+  openModalBtn.addEventListener('click', openModal);
+  closeModalBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  function enviarFormulario() {
+    document.getElementById('filtroForm').submit();
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+</script>
+<script src="/js/sweetAlert.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 
@@ -34,7 +36,7 @@ public class Lote {
     private Date fechaVencimiento;
 
     @Column(name = "costo_unitario")
-    private Double costoUnitario;
+    private BigDecimal costoUnitario;
 
     @Column(name = "estado")
     private Boolean estado; // true = Activo, false = Inactivo
@@ -46,7 +48,7 @@ public class Lote {
     // Constructor con parámetros
 
 
-    public Lote(Integer loteId, OrdenCompra orden, Set<ControlMovimientos> controlMovimientosSet, Producto producto, Integer cantidad, Date fechaIngreso, Date fechaVencimiento, Boolean estado, Double costoUnitario) {
+    public Lote(Integer loteId, OrdenCompra orden, Set<ControlMovimientos> controlMovimientosSet, Producto producto, Integer cantidad, Date fechaIngreso, Date fechaVencimiento, Boolean estado, BigDecimal costoUnitario) {
         this.loteId = loteId;
         this.orden = orden;
         this.controlMovimientosSet = controlMovimientosSet;
@@ -107,11 +109,11 @@ public class Lote {
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    public Double getCostoUnitario() {
+    public BigDecimal getCostoUnitario() {
         return costoUnitario;
     }
 
-    public void setCostoUnitario(Double costoUnitario) {
+    public void setCostoUnitario(BigDecimal costoUnitario) {
         this.costoUnitario = costoUnitario;
     }
 

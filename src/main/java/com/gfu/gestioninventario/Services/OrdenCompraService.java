@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -75,10 +76,11 @@ public class OrdenCompraService {
             detalle.setProducto(producto);
             
             // Validar que el precio unitario sea positivo
-            if(detalle.getPrecioUnitario() <= 0) {
+            if (detalle.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("El precio unitario debe ser mayor que cero");
             }
-            
+
+
             // Validar que la cantidad sea positiva
             if(detalle.getCantidad() <= 0) {
                 throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
@@ -164,8 +166,11 @@ public class OrdenCompraService {
             .orElseThrow(() -> new RuntimeException("Orden no encontrada con ID: " + id));
         
         return detalleOrdenCompraRepository.findByOrden(orden).stream()
-            .mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario())
-            .sum();
+                .mapToDouble(d -> d.getPrecioUnitario()
+                        .multiply(BigDecimal.valueOf(d.getCantidad()))
+                        .doubleValue())
+                .sum();
+
     }
 
     /**
@@ -175,7 +180,7 @@ public class OrdenCompraService {
     private void crearLotesParaOrden(OrdenCompra orden) {
         List<DetalleOrdenCompra> detalles = detalleOrdenCompraRepository.findByOrden(orden);
         for (DetalleOrdenCompra detalle : detalles) {
-            boolean existe = loteRepository.existsByProductoProductoIdAndOrdenCompraOrdenId(
+            boolean existe = loteRepository.existsByProducto_ProductoIdAndOrden_OrdenId(
                     detalle.getProducto().getProductoId(),
                     orden.getOrdenId()
             );

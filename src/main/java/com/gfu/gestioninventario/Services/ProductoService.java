@@ -3,12 +3,14 @@ package com.gfu.gestioninventario.Services;
 import com.gfu.gestioninventario.Models.Producto;
 import com.gfu.gestioninventario.Repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductoService {
+public class ProductoService implements ProductoServiceInt{
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -19,7 +21,14 @@ public class ProductoService {
         if(producto.getNombre() == null || producto.getNombre().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es requerido");
         }
+        if(productoRepository.existsByNombreIgnoreCase(producto.getNombre())) {
+            throw new IllegalArgumentException("El nombre del producto ya existe");
+        }
         return productoRepository.save(producto);
+    }
+
+    public boolean buscarProductoPorNombre(String nombre) {
+        return productoRepository.existsByNombreIgnoreCase(nombre);
     }
 
     // LISTAR
@@ -51,5 +60,23 @@ public class ProductoService {
     // Búsqueda por nombre (adicional)
     public List<Producto> buscarPorNombre(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+
+
+    @Override
+    public Page<Producto> findAll(Pageable pageable) {
+        return productoRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Producto> buscarPorKeyword(String keyword, Pageable pageable) {
+        return productoRepository.findByNombreContainingIgnoreCase(keyword, pageable);
+    }
+    public Page<Producto> buscarProductosPorCategoria(int categoriaId, String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productoRepository.findByCategoriaId(categoriaId, pageable);
+        }
+        return productoRepository.findByCategoriaIdAndKeyword(categoriaId, keyword.toLowerCase(), pageable);
     }
 }

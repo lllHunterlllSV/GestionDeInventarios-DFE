@@ -6,6 +6,7 @@ import com.gfu.gestioninventario.Repository.OrdenCompraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +30,9 @@ public class LoteService {
         if(lote.getCantidad() <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
         }
-        
-        if(lote.getCostoUnitario() <= 0) {
+
+        if (lote.getCostoUnitario().compareTo(BigDecimal.valueOf(0.00)) <= 0) {
+
             throw new IllegalArgumentException("El costo unitario debe ser mayor que cero");
         }
 

@@ -2,6 +2,7 @@ package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -24,8 +25,8 @@ public class DetalleOrdenCompra {
     @Column(name = "cantidad")
     private Integer cantidad;
 
-    @Column(name = "precio_unitario")
-    private Double precioUnitario;
+    @Column( name ="precio_unitario", columnDefinition = "DECIMAL(10,2)")
+    private BigDecimal precioUnitario;
 /// relacion devoluciones de compra
      @OneToMany(mappedBy = "detalleOrdenCompra")
       private List<DevolucionCompra>devoluciones;
@@ -38,7 +39,7 @@ public class DetalleOrdenCompra {
     }
 
     // Constructor con parámetros
-    public DetalleOrdenCompra(OrdenCompra orden, Producto producto, Integer cantidad, Double precioUnitario) {
+    public DetalleOrdenCompra(OrdenCompra orden, Producto producto, Integer cantidad, BigDecimal precioUnitario) {
         this.orden = orden;
         this.producto = producto;
         this.cantidad = cantidad;
@@ -78,11 +79,11 @@ public class DetalleOrdenCompra {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecioUnitario() {
+    public BigDecimal getPrecioUnitario() {
         return precioUnitario;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
 
     }

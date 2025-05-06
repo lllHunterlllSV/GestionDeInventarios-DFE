@@ -1,5 +1,5 @@
 package com.gfu.gestioninventario;
-
+/*
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -50,3 +50,4 @@ public class TestLogin implements CommandLineRunner{
 
 
 }
+*/
