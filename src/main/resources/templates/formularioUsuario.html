@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${title} + ' - App de Gestion de Inventario'">App de Gestion de Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4" th:attr="data-exito=${exito}, data-error=${error}">
+<form th:action="@{/configuracion/usuarios/guardar}" th:object="${usuario}" method="post" class="bg-white shadow-md rounded-lg p-8 max-w-lg w-full relative">
+
+    <input type="hidden" th:field="*{usuario_id}"/>
+    <input type="hidden" th:field="*{roles.role_id}"/>
+    <div class="mb-4" th:if="${!isEdit}">
+        <label for="rolTipo" class="block text-gray-700 font-medium mb-1">Rol del Usuario</label>
+        <input type="text" id="rolTipo" th:value="${usuario.roles.tipo_rol}" disabled
+               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed" />
+    </div>
+
+
+    <a type="button" th:href="@{/configuracion/usuarios/lista}" aria-label="Volver atras" class="absolute top-4 left-4 text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+        <i class="fas fa-arrow-left fa-lg"></i>
+    </a>
+    <h1 class="text-2xl font-semibold mb-6 text-gray-800 text-center" th:text="${title}"></h1>
+
+    <div th:if="${error}"
+         class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-[1.01]">
+        <span th:text="${error}"></span>
+    </div>
+
+
+    <div class="mb-4">
+        <label for="usuarioInput" class="block text-gray-700 font-medium mb-1">Nombre de Usuario <span class="text-red-600">*</span></label>
+        <input type="text" id="usuarioInput" th:field="*{usuario}" maxlength="50" required
+               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p th:if="${#fields.hasErrors('usuario')}" th:errors="*{usuario}" class="text-red-600 text-sm mt-1"></p>
+    </div>
+
+    <div class="mb-4">
+        <label for="nombreCompleto" class="block text-gray-700 font-medium mb-1">Nombre Completo <span class="text-red-600">*</span></label>
+        <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" maxlength="100" required
+               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-red-600 text-sm mt-1"></p>
+    </div>
+
+    <div class="mb-4">
+        <label for="email" class="block text-gray-700 font-medium mb-1">Email <span class="text-red-600">*</span></label>
+        <input type="email" id="email" th:field="*{email}" maxlength="100" required
+               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-600 text-sm mt-1"></p>
+    </div>
+
+    <div class="mb-6">
+        <label for="contrasena" class="block text-gray-700 font-medium mb-1">Contrase&ntilde;a <span class="text-red-600" th:if="${!isEdit}">*</span></label>
+        <input type="password" id="contrasena" th:field="*{contrasena}"
+        th:attr="required=${!isEdit}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p th:if="${isEdit}" class="text-gray-500 text-sm mt-1">Dejar en blanco para no cambiar la contrase&ntilde;a.</p>
+        <p th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-red-600 text-sm mt-1"></p>
+    </div>
+
+    <div class="mb-4" th:if="${isEdit}"> <label for="estadoCheckbox" class="block text-gray-700 font-medium mb-1">Estado:</label>
+    <input type="checkbox" id="estadoCheckbox" name="estado" th:checked="${usuario.estado}"
+           class="form-check-input ml-2">
+    <span class="form-text text-gray-500 text-sm ml-2">Marque para activar el usuario.</span>
+    </div>
+
+    <button type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition-colors duration-300" onClick="confirmarEnvioUsuario()">
+        <i class="fas" th:classappend="${isEdit} ? 'fa-save' : 'fa-user-plus'"></i>
+        <span th:text="${isEdit} ? 'Guardar Cambios' : 'Agregar Usuario'"></span>
+    </button>
+</form>
+
+<script src="/js/sweetAlert.js"></script>
+<script th:inline="javascript">
+    // Esta variable nos dice si estamos en el modo edicion o creacion
+    var isEditForm = /*[[${isEdit}]]*/ false;
+
+    // Funcion para mostrar una alerta de error con SweetAlert2
+    function showValidationError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Validacion',
+            text: message,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Funcion para validar un campo individual para vacio y formato de email
+    function validateField(fieldId, fieldName, isRequired, isEmail = false) {
+        const input = document.getElementById(fieldId);
+        const value = input.value.trim();
+        let isValid = true;
+        let errorMessage = '';
+
+        // 1. Verificar si es requerido y esta vacio
+        if (isRequired && value === '') {
+            isValid = false;
+            errorMessage = `El campo "${fieldName}" es obligatorio.`;
+        }
+        // 2. Verificar formato de email si es un campo de email y no esta vacio
+        else if (isEmail && value !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            isValid = false;
+            errorMessage = `El formato del email es invalido.`;
+        }
+
+        if (!isValid) {
+            showValidationError(errorMessage);
+        }
+        return isValid;
+    }
+
+    // Funcion principal de confirmacion y validacion para usuarios
+    function confirmarEnvioUsuario() {
+        let allClientSideValid = true;
+
+        // Validar 'Nombre de Usuario' (Obligatorio)
+        allClientSideValid = validateField('usuarioInput', 'Nombre de Usuario', true);
+        if (!allClientSideValid) return; // Si falla, detiene la ejecucion
+
+        // Validar 'Nombre Completo' (Obligatorio)
+        allClientSideValid = validateField('nombreCompleto', 'Nombre Completo', true);
+        if (!allClientSideValid) return;
+
+        // Validar 'Email' (Obligatorio y formato de email)
+        allClientSideValid = validateField('email', 'Email', true, true); // El ultimo 'true' indica que es un campo de email
+        if (!allClientSideValid) return;
+
+        // Validar 'Contrasena' (Obligatoria solo para nuevos usuarios)
+        if (!isEditForm) { // Si NO estamos en el modo edicion (es un nuevo usuario)
+            const contrasenaInput = document.getElementById('contrasena');
+            const contrasenaValue = contrasenaInput.value.trim();
+
+            if (contrasenaValue === '') {
+                showValidationError('La contrasena es obligatoria para nuevos usuarios.');
+                return;
+            }
+            if (contrasenaValue.length < 8) {
+                showValidationError('La contrasena debe tener al menos 8 caracteres.');
+                return;
+            }
+        }
+
+        // Si todas las validaciones del lado del cliente pasaron, muestra el dialogo de confirmacion
+        Swal.fire({
+            title: 'Estas seguro?',
+            text: 'Deseas guardar este usuario?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6', // Azul
+            cancelButtonColor: '#d33', // Rojo
+            confirmButtonText: 'Si, guardar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, envia el formulario
+                document.querySelector('form').submit();
+            }
+        });
+    }
+</script>
+</body>
+</html>
