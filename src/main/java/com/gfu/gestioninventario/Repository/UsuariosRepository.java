@@ -9,4 +9,5 @@ import com.gfu.gestioninventario.Models.Usuarios;
 
 public interface UsuariosRepository extends JpaRepository<Usuarios, Integer>{
     Optional<Usuarios> findByUsuario(String usuario);
+
 }

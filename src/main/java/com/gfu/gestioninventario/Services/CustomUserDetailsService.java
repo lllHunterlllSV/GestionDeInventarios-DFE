@@ -1,5 +1,5 @@
 package com.gfu.gestioninventario.Services;
-/*
+
 import com.gfu.gestioninventario.Models.Usuarios;
 import com.gfu.gestioninventario.Repository.UsuariosRepository;
 import com.gfu.gestioninventario.security.CustomUserDetails;
@@ -19,4 +19,4 @@ public class CustomUserDetailsService implements UserDetailsService{
     return new CustomUserDetails(usuario);
     }
     
-}*/
+}

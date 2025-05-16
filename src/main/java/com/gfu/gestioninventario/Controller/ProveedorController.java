@@ -42,7 +42,8 @@ public class ProveedorController {
 
         Page<Proveedores> paginaProveedores = keyword.isEmpty() ?
                 proveedoresService.findAll(pageable) :
-                proveedoresService.buscarPorKeyword(keyword, pageable);
+                proveedoresService.buscarPorKeyword(keyword, page + 1, size); // SQL Server comienza en 1, no 0
+
 
         model.addAttribute("proveedores", paginaProveedores);
         model.addAttribute("keyword", keyword);
@@ -55,34 +56,41 @@ public class ProveedorController {
 
         return "gestionProveedores";
     }
-
     @PostMapping("/guardarProveedor")
-    public String guardarProveedores(@ModelAttribute Proveedores proveedores, Model model) {
+    public String guardarProveedores(@ModelAttribute Proveedores proveedores,
+                                     @RequestParam(required = false) String origen,
+                                     RedirectAttributes redirectAttributes) {
         try {
             if (proveedores.getProveedorId() == null) {
-                if (proveedoresService.existeProveedor(proveedores.getNcrNit(), proveedores.getPersona(), proveedores.getEmail(), proveedores.getTelefono(), proveedores.getNombreProveedor())) {
-                    model.addAttribute("error", "El proveedor ya existe");
-                    return "formularioProveedor"; // Misma vista de formulario
+                if (proveedoresService.existeProveedor(
+                        proveedores.getNcrNit(),
+                        proveedores.getPersona(),
+                        proveedores.getEmail(),
+                        proveedores.getTelefono(),
+                        proveedores.getNombreProveedor())) {
+                    redirectAttributes.addFlashAttribute("error", "El proveedor ya existe");
+                    return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
                 }
                 proveedoresService.ingresarNuevoProveedores(proveedores);
-                model.addAttribute("exito", "El formulario fue guardado con exito");
-            } else  {
-                // Tiene ID → modificar proveedor existente
+                redirectAttributes.addFlashAttribute("exito", "El formulario fue guardado con éxito");
+            } else {
                 proveedoresService.modificarProveedor(proveedores);
-                model.addAttribute("exito", "El formulario fue editado con exito");
+                redirectAttributes.addFlashAttribute("exito", "El formulario fue editado con éxito");
             }
 
-            return "formularioProveedor"; // Misma vista de formulario
-        } catch(Exception e){
-            model.addAttribute("error", "Error al guardar: " + e.getMessage());
-            return "formularioProveedor";
+            return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
+            return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
         }
-
-
     }
+
+
     @GetMapping("/form")
-        public String form(Model model) {
+        public String form(Model model,@RequestParam(required = false) String origen) {
         model.addAttribute("proveedores", new Proveedores());
+        model.addAttribute("origen", origen);
+
         return "formularioProveedor";
     }
     @GetMapping("/editar/{id}")
