@@ -22,58 +22,58 @@
             </h1>
         </div>
         <nav class="px-4 py-6 space-y-1">
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#login">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/login}">
                 <i class="fas fa-sign-in-alt w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Login / Autenticación
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#gestion-productos">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/productos/categorias}">
                 <i class="fas fa-boxes w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de productos
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#gestion-proveedores">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/proveedores/lista}">
                 <i class="fas fa-truck w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de proveedores
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#gestion-entradas">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/gestion-entradas}">
                 <i class="fas fa-arrow-down w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de entradas
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#gestion-salidas">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/gestion-salidas}">
                 <i class="fas fa-arrow-up w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de salidas
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#historial-movimientos">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/historial-movimientos}">
                 <i class="fas fa-history w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Historial de movimientos
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#reportes">
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/clientes/lista}">
+                <i class="fas fa-users-cog w-5"></i>
+                <span class="ml-3 text-sm font-medium">
+                        Módulo de clientes
+                    </span>
+            </a>
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/configuracion/usuarios}">
+                <i class="fas fa-cogs w-5"></i>
+                <span class="ml-3 text-sm font-medium">
+                         Módulo de usuarios
+                    </span>
+            </a>
+                        <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/reportes}">
                 <i class="fas fa-chart-line w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Reportes
-                    </span>
-            </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#modulo-usuarios">
-                <i class="fas fa-users-cog w-5"></i>
-                <span class="ml-3 text-sm font-medium">
-                        Módulo de usuarios
-                    </span>
-            </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" href="#configuracion">
-                <i class="fas fa-cogs w-5"></i>
-                <span class="ml-3 text-sm font-medium">
-                        Configuración
                     </span>
             </a>
         </nav>

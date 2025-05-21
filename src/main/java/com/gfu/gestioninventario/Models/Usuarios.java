@@ -1,56 +1,68 @@
 package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Objects; 
 import java.util.Set;
 
 
 @Entity
 @Table(name = "usuarios")
-
 public class Usuarios {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuario_id")
     private Integer usuario_id;
-    @Column(name = "usuario")
+
+    @NotBlank(message = "El nombre de usuario no puede estar vacio.")
+    @Size(max = 10, message = "El nombre de usuario no puede exceder 10 caracteres.")
+    @Column(name = "usuario", nullable = false, unique = true, length = 10) 
     private String usuario;
-    @Column(name = "contraseña")
+
+    @Column(name = "contraseña", nullable = false) // Establecido como no nulo
     private String contrasena;
-    @Column(name = "nombreCompleto")
+
+    @NotBlank(message = "El nombre completo no puede estar vacio.")
+    @Size(max = 30, message = "El nombre completo no puede exceder 30 caracteres.")
+    @Column(name = "nombreCompleto", nullable = false, length = 30) 
     private String nombreCompleto;
-    @Column(name="email")
+
+    @NotBlank(message = "El email no puede estar vacio.")
+    @Email(message = "El formato del email no es valido.")
+    @Column(name="email", nullable = false, unique = true, length = 20) 
     private String email;
-    @Column(name="estado")
-    private boolean estado;
+
+    @Column(name="estado", nullable = false) // Establecido como no nulo
+    private Boolean estado;
 
     /// mapeo a tabla roles
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "rol_id")
-  private Roles roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rol_id", nullable = false) // Se asume que un usuario siempre debe tener un rol
+    private Roles roles;
 
-  /// mapeo a tabla control de movimiento
-  @OneToMany(mappedBy = "usuario")
-  private Set<ControlMovimientos> controlMovimientosSet;
-  /// mapeo a ventas
-  @OneToMany(mappedBy = "usuarioId")
-  private List<Venta> ventas;
-  /// mapeo a devoluciones
-  @OneToMany (mappedBy = "usuario")
-  private List<Devolucion> devoluciones;
+    /// mapeo a tabla control de movimiento
+    @OneToMany(mappedBy = "usuario")
+    private Set<ControlMovimientos> controlMovimientosSet;
+    /// mapeo a ventas
+    @OneToMany(mappedBy = "usuarioId")
+    private List<Venta> ventas;
+    /// mapeo a devoluciones
+    @OneToMany (mappedBy = "usuario")
+    private List<Devolucion> devoluciones;
 
-  ///realcaion devoluciones de compra
-  @OneToMany (mappedBy = "usuario")
-  private List<DevolucionCompra> devolucionCompra;
+    ///realcaion devoluciones de compra
+    @OneToMany (mappedBy = "usuario")
+    private List<DevolucionCompra> devolucionCompra;
 
     //constructor
-
-
     public Usuarios() {
     }
 
-    public Usuarios(Integer usuario_id, List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, boolean estado, String nombreCompleto, String email, String contrasena, String usuario) {
+    public Usuarios(Integer usuario_id, List<DevolucionCompra> devolucionCompra, List<Devolucion> devoluciones, List<Venta> ventas, Set<ControlMovimientos> controlMovimientosSet, Roles roles, Boolean estado, String nombreCompleto, String email, String contrasena, String usuario) {
         this.usuario_id = usuario_id;
         this.devolucionCompra = devolucionCompra;
         this.devoluciones = devoluciones;
@@ -64,11 +76,7 @@ public class Usuarios {
         this.usuario = usuario;
     }
 
-    /// getters y setters
-    ///
-
-
-
+    // --- Getters y Setters ---
 
     public String getEmail() {
         return email;
@@ -156,5 +164,18 @@ public class Usuarios {
 
     public void setEstado(Boolean estado) {
         this.estado = estado;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuarios usuarios = (Usuarios) o;
+        return Objects.equals(usuario_id, usuarios.usuario_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(usuario_id);
     }
 }
