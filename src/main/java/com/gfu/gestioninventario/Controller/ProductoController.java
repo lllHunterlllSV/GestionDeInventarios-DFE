@@ -86,11 +86,19 @@ public class ProductoController {
     /// Categorias controller
 
     @GetMapping("/categorias")
-    public String categorias(Model model) {
-        List<Categoria> categoriasList = categoriaService.obtenerTodasCategorias();
-        model.addAttribute("categorias", categoriasList);
-        return "productosCategorias";
+    public String filtrarCategorias(
+            @RequestParam(required = false) String keyword,
+            Model model) {
 
+        // Obtener todas las categorías si no hay keyword, o filtrar si hay
+        List<Categoria> categorias = (keyword == null || keyword.isEmpty())
+                ? categoriaService.obtenerTodasCategorias()
+                : categoriaService.buscarCategoriasPorKeyword(keyword);
+
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("keyword", keyword); // Para mantener el valor en el input
+
+        return "productosCategorias";
     }
 
     //mostrar categorias
@@ -124,8 +132,13 @@ public class ProductoController {
         Page<Producto> paginaProductos = productoService.buscarProductosPorCategoria(
                 id,
                 keyword.trim(),
-                pageable
+                pageable,
+                sortField,
+                sortDir
         );
+
+
+
 
         // Configuración del modelo
         model.addAttribute("categoria", categoria);
