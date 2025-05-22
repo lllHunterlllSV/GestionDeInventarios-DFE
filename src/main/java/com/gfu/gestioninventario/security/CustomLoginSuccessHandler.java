@@ -1,3 +1,4 @@
+/*
 package com.gfu.gestioninventario.security;
 
 import jakarta.servlet.ServletException;
@@ -24,3 +25,4 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         }
     }
 }
+*/

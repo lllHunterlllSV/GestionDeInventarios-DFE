@@ -24,7 +24,7 @@ public class ControlMovimientos {
 
     /// relacion usuario
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = true)
     private Usuarios usuario;
 ///relacion tipo
     @ManyToOne

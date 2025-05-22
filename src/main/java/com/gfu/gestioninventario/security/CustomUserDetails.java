@@ -1,3 +1,4 @@
+/*
 package com.gfu.gestioninventario.security;
 
 import com.gfu.gestioninventario.Models.Usuarios;
@@ -53,3 +54,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.gfu.gestioninventario.Controller;
 
 import com.gfu.gestioninventario.Models.Usuarios;
@@ -21,3 +22,4 @@ public class LoginController {
 
 
 }
+*/
