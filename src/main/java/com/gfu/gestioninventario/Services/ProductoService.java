@@ -1,9 +1,13 @@
 package com.gfu.gestioninventario.Services;
 
+import com.gfu.gestioninventario.Models.Categoria;
 import com.gfu.gestioninventario.Models.Producto;
 import com.gfu.gestioninventario.Repository.ProductoRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -14,6 +18,8 @@ public class ProductoService implements ProductoServiceInt{
 
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    EntityManager entityManager;
 
     // CREAR
     public Producto crearProducto(Producto producto) {
@@ -73,10 +79,54 @@ public class ProductoService implements ProductoServiceInt{
     public Page<Producto> buscarPorKeyword(String keyword, Pageable pageable) {
         return productoRepository.findByNombreContainingIgnoreCase(keyword, pageable);
     }
-    public Page<Producto> buscarProductosPorCategoria(int categoriaId, String keyword, Pageable pageable) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return productoRepository.findByCategoriaId(categoriaId, pageable);
-        }
-        return productoRepository.findByCategoriaIdAndKeyword(categoriaId, keyword.toLowerCase(), pageable);
+
+    public Page<Producto> buscarProductosPorCategoria(
+            int categoriaId,
+            String keyword,
+            Pageable pageable,
+            String sortField,
+            String sortDir) {
+
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+
+        // Validar campos para evitar SQL injection
+        List<String> camposOrdenables = List.of("producto_id", "nombre", "descripcion", "precio", "stock");
+        sortField = camposOrdenables.contains(sortField) ? sortField : "producto_id";
+        sortDir = sortDir.equalsIgnoreCase("desc") ? "desc" : "asc";
+
+        // Llamar al stored procedure con ordenamiento dinámico
+        Query query = entityManager.createNativeQuery(
+                "EXEC sp_buscar_productos_por_categoria_y_keyword " +
+                        ":categoriaId, :keyword, :page, :size, :sortField, :sortDir",
+                Producto.class
+        );
+
+        query.setParameter("categoriaId", categoriaId);
+        query.setParameter("keyword", keyword);
+        query.setParameter("page", page);
+        query.setParameter("size", size);
+        query.setParameter("sortField", sortField);
+        query.setParameter("sortDir", sortDir);
+
+        @SuppressWarnings("unchecked")
+        List<Producto> productos = query.getResultList();
+
+        // Total (si no lo integraste al SP)
+        Query countQuery = entityManager.createNativeQuery(
+                "SELECT COUNT(*) FROM dbo.productos WHERE categoria_id = ?1 " +
+                        "AND (LOWER(nombre) LIKE CONCAT('%', LOWER(?2), '%') " +
+                        "OR LOWER(descripcion) LIKE CONCAT('%', LOWER(?2), '%'))"
+        );
+        countQuery.setParameter(1, categoriaId);
+        countQuery.setParameter(2, keyword);
+        long total = ((Number) countQuery.getSingleResult()).longValue();
+
+        return new PageImpl<>(productos, pageable, total);
     }
+
+
+
+
+
 }

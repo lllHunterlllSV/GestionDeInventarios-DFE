@@ -25,7 +25,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     // Buscar por nombre (parcial/contiene)
     List<Cliente> findByNombreClienteContainingIgnoreCase(String nombreCliente);
 
-    // Buscar solo clientes activos
+    // Buscar solo clientes activos   ////procedimiento almacenado
     @Query("SELECT c FROM Cliente c WHERE c.estado = true")
     List<Cliente> findAllActiveClients();
 
@@ -37,7 +37,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     // Buscar por teléfono
     Optional<Cliente> findByTelefono(Integer telefono);
 
-    // Búsqueda personalizada por varios campos
+    // Búsqueda personalizada por varios campos                          ////procedimiento almacenado
     @Query("SELECT c FROM Cliente c WHERE " +
             "(:nombre IS NULL OR LOWER(c.nombreCliente) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
             "(:tipoClienteId IS NULL OR c.tipoCliente.tipoClienteId = :tipoClienteId) AND " +

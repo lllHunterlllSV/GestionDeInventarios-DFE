@@ -29,16 +29,17 @@
 
       <div class="mt-10 text-center mb-6">
         <h3 class="text-2xl font-semibold text-gray-800">
-          Gestión de Productos
+          Gestión de Productos - [[${categoria.nombre}]]
         </h3>
+
       </div>
 
       <div class="bg-white rounded-lg shadow-md p-6 mt-10 mx-auto w-full max-w-8xl">
         <div class="mb-4">
-          <button type="button" onclick="history.back()" aria-label="Volver atrás"
+          <a  th:href="@{/productos/categorias}"
                   class="text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
             <i class="fas fa-arrow-left fa-lg"></i>
-          </button>
+          </a>
         </div>
 
 
@@ -63,15 +64,19 @@
 
             <!-- Select de orden -->
             <div>
-              <select name="sortField" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="enviarFormulario()" th:value="${sortField}">
+              <select name="sortField"
+                      class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      th:value="${sortField}">
                 <option value="productoId">Ordenar por ID</option>
                 <option value="nombre">Ordenar por Nombre</option>
-
               </select>
             </div>
 
+
             <div>
-              <select name="sortDir" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="enviarFormulario()"  th:value="${sortDir}">
+              <select name="sortDir"
+                      class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      th:value="${sortDir}">
                 <option value="asc">Ascendente</option>
                 <option value="desc">Descendente</option>
               </select>
