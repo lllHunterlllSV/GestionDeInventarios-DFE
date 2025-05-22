@@ -33,4 +33,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
             @Param("categoriaId") int categoriaId,
             @Param("keyword") String keyword,
             Pageable pageable);
+
+
+    // Metodo para obtener la cantidad de productos por categoria
+    // Devuelve una lista de arrays de objetos, donde cada array es [nombreCategoria, cantidad]
+    // Consulta JPQL corregida para usar 'p.categoria.nombre'
+    @Query("SELECT p.categoria.nombre, COUNT(p) FROM Producto p GROUP BY p.categoria.nombre")
+    List<Object[]> countProductsByCategory();
 }
