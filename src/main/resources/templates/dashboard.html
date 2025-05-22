@@ -3,29 +3,236 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title th:text="${title} + ' - App de Gestión de Inventario'">App de Gestión de Inventario</title>
+    <title th:text="${title} + ' - App de Gestion de Inventario'">App de Gestion de Inventario</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Estilo para los numeros de las tarjetas */
+        .card-number {
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+        /* Estilo para las etiquetas de las tarjetas */
+         .card-label {
+            font-family: 'Inter', sans-serif; 
+         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 <div class="flex flex-1 min-h-0">
-    <!-- Sidebar -->
     <div th:insert="fragments/fragmentoSidebar :: sidebar"></div>
 
-    <!-- Main content -->
     <div class="flex flex-col flex-1 md:pl-64 min-h-screen">
-        <!-- Topbar -->
         <div th:insert="fragments/fragmentoNavbar:: navbar"></div>
 
+        <section class="mb-12 px-4 py-8" id="dashboard-content"> <div class="mt-4 text-center mb-8"> <h3 class="text-3xl font-bold text-gray-800"> Panel de Control
+                </h3>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-8 mt-6 mx-auto w-full max-w-8xl"> <h4 class="text-2xl font-semibold text-gray-700 mb-8 border-b pb-4">Resumen General del Inventario</h4> <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8"> <div class="bg-blue-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105"> <div class="flex-shrink-0 bg-blue-600 p-4 rounded-full text-white shadow-md"> <i class="fas fa-box fa-3x"></i> </div>
+                        <div>
+                            <div class="text-xl font-medium text-blue-900 card-label">Total Productos</div> <div class="text-3xl font-bold text-blue-900 card-number" th:text="${totalProductos}">0</div> </div>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105">
+                        <div class="flex-shrink-0 bg-yellow-600 p-4 rounded-full text-white shadow-md">
+                             <i class="fas fa-boxes fa-3x"></i> </div>
+                        <div>
+                            <div class="text-xl font-medium text-yellow-900 card-label">Total Lotes</div>
+                            <div class="text-3xl font-bold text-yellow-900 card-number" th:text="${totalLotes}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105">
+                        <div class="flex-shrink-0 bg-green-600 p-4 rounded-full text-white shadow-md">
+                            <i class="fas fa-users fa-3x"></i>
+                        </div>
+                        <div>
+                            <div class="text-xl font-medium text-green-900 card-label">Total Clientes</div>
+                            <div class="text-3xl font-bold text-green-900 card-number" th:text="${totalClientes}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105">
+                        <div class="flex-shrink-0 bg-red-600 p-4 rounded-full text-white shadow-md">
+                            <i class="fas fa-truck fa-3x"></i>
+                        </div>
+                        <div>
+                            <div class="text-xl font-medium text-red-900 card-label">Total Proveedores</div>
+                            <div class="text-3xl font-bold text-red-900 card-number" th:text="${totalProveedores}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105">
+                        <div class="flex-shrink-0 bg-purple-600 p-4 rounded-full text-white shadow-md">
+                            <i class="fas fa-shopping-cart fa-3x"></i>
+                        </div>
+                        <div>
+                            <div class="text-xl font-medium text-purple-900 card-label">Total Ventas</div>
+                            <div class="text-3xl font-bold text-purple-900 card-number" th:text="${totalVentas}">0</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-100 rounded-xl shadow-lg p-7 flex items-center space-x-5 transform transition duration-300 hover:scale-105">
+                        <div class="flex-shrink-0 bg-indigo-600 p-4 rounded-full text-white shadow-md">
+                            <i class="fas fa-file-invoice fa-3x"></i>
+                        </div>
+                        <div>
+                            <div class="text-xl font-medium text-indigo-900 card-label">Total Ordenes Compra</div>
+                            <div class="text-3xl font-bold text-indigo-900 card-number" th:text="${totalOrdenesCompra}">0</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="mt-12">
+                    <h4 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-4">Estadísticas de Productos por Categoría</h4>
+
+                    <div class="bg-gray-50 rounded-lg shadow-md p-6">
+                        <canvas id="productsByCategoryChart"></canvas>
+                    </div>
+                </div>
+                </div>
+        </section>
     </div>
 </div>
 
+<script src="/js/sweetAlert.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const exito = document.body.getAttribute('data-exito');
+        const error = document.body.getAttribute('data-error');
 
+        if (exito) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Operacion Exitosa',
+                text: exito,
+                confirmButtonText: 'Entendido'
+            });
+        } else if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error,
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        // Datos pasados desde el backend
+        const productosPorCategoriaData = /*[[${productosPorCategoria}]]*/ [];
+
+        // Preparar datos para Chart.js
+        const labels = [];
+        const data = [];
+        // Paleta de colores para la grafica 
+        const backgroundColors = [
+            'rgba(52, 58, 64, 0.8)',  // Gris oscuro
+            'rgba(0, 128, 128, 0.8)',  // Verde Azulado Oscuro (Dark Cyan)
+            'rgba(25, 25, 112, 0.8)',  // Azul Medianoche (Oscuro)
+            'rgba(34, 139, 34, 0.8)',  // Verde Bosque Oscuro
+            'rgba(85, 107, 47, 0.8)',  // Verde oliva oscuro (DarkOliveGreen)
+            'rgba(72, 61, 139, 0.8)',  // Purpura oscuro 2 (DarkSlateBlue)
+            'rgba(184, 134, 11, 0.8)'  // Dorado oscuro (DarkGoldenrod)
+           
+        ];
+         const borderColors = [
+            'rgba(52, 58, 64, 1)',
+            'rgba(0, 128, 128, 1)',
+            'rgba(25, 25, 112, 1)',
+            'rgba(34, 139, 34, 1)',
+            'rgba(85, 107, 47, 1)',
+            'rgba(72, 61, 139, 1)',
+            'rgba(184, 134, 11, 1)'
+           
+        ];
+
+
+        productosPorCategoriaData.forEach(item => {
+            labels.push(item[0]); // Nombre de la categoria
+            data.push(item[1]);   // Cantidad de productos
+        });
+
+        // Configurar la grafica
+        const ctx = document.getElementById('productsByCategoryChart').getContext('2d');
+        const productsByCategoryChart = new Chart(ctx, {
+            type: 'bar', 
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Cantidad de Productos',
+                    data: data,
+                    backgroundColor: backgroundColors.slice(0, data.length), // Usar solo los colores necesarios
+                    borderColor: borderColors.slice(0, data.length), // Usar solo los colores de borde necesarios
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Permite controlar el tamaño con CSS
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: { 
+                                size: 14
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Cantidad',
+                            font: { 
+                                size: 16
+                            }
+                        }
+                    },
+                    x: {
+                         ticks: {
+                            font: { 
+                                size: 14
+                            }
+                        },
+                         title: {
+                            display: true,
+                            text: 'Categoría',
+                            font: { 
+                                size: 16
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // O true si quieres mostrar la leyenda
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribución de Productos por Categoría',
+                        font: { 
+                            size: 18
+                        }
+                    }
+                }
+            }
+        });
+
+         // Ajustar el tamaño del canvas para que sea responsive
+         function resizeChart() {
+             const container = document.getElementById('productsByCategoryChart').parentElement;
+             const canvas = document.getElementById('productsByCategoryChart');
+             canvas.style.height = '400px'; 
+             productsByCategoryChart.resize();
+         }
+
+         window.addEventListener('load', resizeChart);
+         window.addEventListener('resize', resizeChart);
+
+
+    });
+</script>
 </body>
 </html>
