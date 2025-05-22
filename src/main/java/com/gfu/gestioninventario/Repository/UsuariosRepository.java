@@ -7,7 +7,8 @@ import org.springframework.data.repository.query.Param;
 import com.gfu.gestioninventario.Models.Usuarios;
 import java.util.List;
 
-public interface UsuariosRepository extends JpaRepository<Usuarios, Integer>{
+public interface
+UsuariosRepository extends JpaRepository<Usuarios, Integer>{
     Optional<Usuarios> findByUsuario(String usuario);
     Optional<Usuarios> findByEmail(String email);
     Optional<Usuarios> findByNombreCompleto(String nombreCompleto);
