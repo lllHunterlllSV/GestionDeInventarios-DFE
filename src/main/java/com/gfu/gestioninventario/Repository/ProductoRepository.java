@@ -30,4 +30,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     // Método para obtener la cantidad de productos por categoría
     @Query("SELECT p.categoria.nombre, COUNT(p) FROM Producto p GROUP BY p.categoria.nombre")
     List<Object[]> countProductsByCategory();
+
+
+    @Query("SELECT p FROM Producto p WHERE p.categoria.id = :categoriaId")
+    Page<Producto> findByCategoriaId(@Param("categoriaId") int categoriaId, Pageable pageable);
+
+
+    @Query("SELECT p FROM Producto p WHERE p.proveedores.proveedorId = :proveedorId")
+    List<Producto> findByProveedorProveedorId(@Param("proveedorId") Integer proveedorId);
 }

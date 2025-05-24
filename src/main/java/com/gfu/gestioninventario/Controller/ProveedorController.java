@@ -112,7 +112,7 @@ public class ProveedorController {
             return "redirect:/proveedores/lista";
         } catch (RuntimeException ex) {
             // Vuelve a cargar la lista y muestra el error directamente en la vista
-            List<Proveedores> lista = proveedoresService.listaeProveedores();
+            List<Proveedores> lista = proveedoresService.listadeProveedores();
             model.addAttribute("listaProveedores", lista);
             redirectAttributes.addFlashAttribute("error", "No se pudo eliminar el proveedor");
             return "listaProveedores"; // Asegúrate de usar el nombre correcto de tu plantilla

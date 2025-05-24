@@ -45,7 +45,7 @@ public class ProductoController {
 
     public String formulario(Model model) {
         model.addAttribute("producto", new Producto());
-        model.addAttribute("proveedores", proveedoresService.listaeProveedores());
+        model.addAttribute("proveedores", proveedoresService.listadeProveedores());
         model.addAttribute("medidas", medidasService.listaMedidas());
         model.addAttribute("categorias",categoriaService.obtenerTodasCategorias());
         return "formularioProducto";
@@ -200,7 +200,7 @@ public class ProductoController {
         Optional<Producto> productoEditado = productoService.obtenerProductoPorId(id);
         if (productoEditado.isPresent()) {
             model.addAttribute("producto", productoEditado.get());
-            model.addAttribute("proveedores", proveedoresService.listaeProveedores());
+            model.addAttribute("proveedores", proveedoresService.listadeProveedores());
             model.addAttribute("medidas", medidasService.listaMedidas());
             model.addAttribute("categorias",categoriaService.obtenerTodasCategorias());
             return "formularioProducto";
