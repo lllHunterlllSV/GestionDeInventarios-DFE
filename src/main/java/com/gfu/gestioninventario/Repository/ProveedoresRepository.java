@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 public interface ProveedoresRepository extends JpaRepository<Proveedores, Integer> {
@@ -21,9 +20,7 @@ public interface ProveedoresRepository extends JpaRepository<Proveedores, Intege
     Proveedores findByNcrNit(String ncrNit);
 
 
-    ////procedimiento almacenado
-    ///
-    /**
+
     @Query("""
     SELECT p FROM Proveedores p 
     WHERE LOWER(p.nombreProveedor) LIKE LOWER(CONCAT('%', :keyword, '%')) 
@@ -35,9 +32,15 @@ public interface ProveedoresRepository extends JpaRepository<Proveedores, Intege
     OR CONCAT('', p.proveedorId) LIKE CONCAT('%', :keyword, '%')
 """)
     Page<Proveedores> buscarPorKeyword(@Param("keyword") String keyword, Pageable pageable);
-    */
 
+    @Query("""
+SELECT COUNT(p) >0 FROM Proveedores p
+WHERE p.ncrNit = :ncrNit
+OR p.persona = :persona
+or p.email = :email
+OR p.telefono = :telefono
+OR p.nombreProveedor = :nombreProveedor
 
-
-
+""")boolean ExisteProveedores(@Param("ncrNit") String ncrNit,@Param("persona") String persona, @Param("email") String email,
+                              @Param("telefono") Integer telefono, @Param("nombreProveedor") String nombreProveedor);
 }

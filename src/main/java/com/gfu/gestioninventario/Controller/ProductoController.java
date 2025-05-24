@@ -45,7 +45,7 @@ public class ProductoController {
 
     public String formulario(Model model) {
         model.addAttribute("producto", new Producto());
-        model.addAttribute("proveedores", proveedoresService.listaeProveedores());
+        model.addAttribute("proveedores", proveedoresService.listadeProveedores());
         model.addAttribute("medidas", medidasService.listaMedidas());
         model.addAttribute("categorias",categoriaService.obtenerTodasCategorias());
         return "formularioProducto";
@@ -86,19 +86,11 @@ public class ProductoController {
     /// Categorias controller
 
     @GetMapping("/categorias")
-    public String filtrarCategorias(
-            @RequestParam(required = false) String keyword,
-            Model model) {
-
-        // Obtener todas las categorías si no hay keyword, o filtrar si hay
-        List<Categoria> categorias = (keyword == null || keyword.isEmpty())
-                ? categoriaService.obtenerTodasCategorias()
-                : categoriaService.buscarCategoriasPorKeyword(keyword);
-
-        model.addAttribute("categorias", categorias);
-        model.addAttribute("keyword", keyword); // Para mantener el valor en el input
-
+    public String categorias(Model model) {
+        List<Categoria> categoriasList = categoriaService.obtenerTodasCategorias();
+        model.addAttribute("categorias", categoriasList);
         return "productosCategorias";
+
     }
 
     //mostrar categorias
@@ -132,13 +124,8 @@ public class ProductoController {
         Page<Producto> paginaProductos = productoService.buscarProductosPorCategoria(
                 id,
                 keyword.trim(),
-                pageable,
-                sortField,
-                sortDir
+                pageable
         );
-
-
-
 
         // Configuración del modelo
         model.addAttribute("categoria", categoria);
@@ -200,7 +187,7 @@ public class ProductoController {
         Optional<Producto> productoEditado = productoService.obtenerProductoPorId(id);
         if (productoEditado.isPresent()) {
             model.addAttribute("producto", productoEditado.get());
-            model.addAttribute("proveedores", proveedoresService.listaeProveedores());
+            model.addAttribute("proveedores", proveedoresService.listadeProveedores());
             model.addAttribute("medidas", medidasService.listaMedidas());
             model.addAttribute("categorias",categoriaService.obtenerTodasCategorias());
             return "formularioProducto";

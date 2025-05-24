@@ -30,24 +30,15 @@ public class SecurityConfig {
 
     //DEFINE LAS AUTORIZACIONES DE ACCESO
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoginSuccessHandler successHandler) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-                    .requestMatchers("/", "/dashboard").permitAll()
-                    .requestMatchers("/productos/**").hasAnyRole("ADMIN")
-                    .requestMatchers("/proveedores/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(login -> login
                 .loginPage("/login")
-                    .loginProcessingUrl("/login")
-
-                    .usernameParameter("usuario")
-                    .passwordParameter("contrasena")
-                    .successHandler(successHandler)
-                    .defaultSuccessUrl("/dashboard", true)
-
+                .defaultSuccessUrl("/dashboard", true)
                 .permitAll()
             )
             .logout(logout -> logout
@@ -57,7 +48,5 @@ public class SecurityConfig {
 
             return http.build();
     }
-
-
 }
- */
+*/

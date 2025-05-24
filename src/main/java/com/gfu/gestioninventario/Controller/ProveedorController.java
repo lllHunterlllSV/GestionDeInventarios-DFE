@@ -42,8 +42,7 @@ public class ProveedorController {
 
         Page<Proveedores> paginaProveedores = keyword.isEmpty() ?
                 proveedoresService.findAll(pageable) :
-                proveedoresService.buscarPorKeyword(keyword, page + 1, size); // SQL Server comienza en 1, no 0
-
+                proveedoresService.buscarPorKeyword(keyword, pageable);
 
         model.addAttribute("proveedores", paginaProveedores);
         model.addAttribute("keyword", keyword);
@@ -56,41 +55,34 @@ public class ProveedorController {
 
         return "gestionProveedores";
     }
+
     @PostMapping("/guardarProveedor")
-    public String guardarProveedores(@ModelAttribute Proveedores proveedores,
-                                     @RequestParam(required = false) String origen,
-                                     RedirectAttributes redirectAttributes) {
+    public String guardarProveedores(@ModelAttribute Proveedores proveedores, Model model) {
         try {
             if (proveedores.getProveedorId() == null) {
-                if (proveedoresService.existeProveedor(
-                        proveedores.getNcrNit(),
-                        proveedores.getPersona(),
-                        proveedores.getEmail(),
-                        proveedores.getTelefono(),
-                        proveedores.getNombreProveedor())) {
-                    redirectAttributes.addFlashAttribute("error", "El proveedor ya existe");
-                    return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
+                if (proveedoresService.existeProveedor(proveedores.getNcrNit(), proveedores.getPersona(), proveedores.getEmail(), proveedores.getTelefono(), proveedores.getNombreProveedor())) {
+                    model.addAttribute("error", "El proveedor ya existe");
+                    return "formularioProveedor"; // Misma vista de formulario
                 }
                 proveedoresService.ingresarNuevoProveedores(proveedores);
-                redirectAttributes.addFlashAttribute("exito", "El formulario fue guardado con éxito");
-            } else {
+                model.addAttribute("exito", "El formulario fue guardado con exito");
+            } else  {
+                // Tiene ID → modificar proveedor existente
                 proveedoresService.modificarProveedor(proveedores);
-                redirectAttributes.addFlashAttribute("exito", "El formulario fue editado con éxito");
+                model.addAttribute("exito", "El formulario fue editado con exito");
             }
 
-            return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
-            return "redirect:/proveedores/form" + (origen != null ? "?origen=" + origen : "");
+            return "formularioProveedor"; // Misma vista de formulario
+        } catch(Exception e){
+            model.addAttribute("error", "Error al guardar: " + e.getMessage());
+            return "formularioProveedor";
         }
+
+
     }
-
-
     @GetMapping("/form")
-        public String form(Model model,@RequestParam(required = false) String origen) {
+        public String form(Model model) {
         model.addAttribute("proveedores", new Proveedores());
-        model.addAttribute("origen", origen);
-
         return "formularioProveedor";
     }
     @GetMapping("/editar/{id}")
@@ -112,7 +104,7 @@ public class ProveedorController {
             return "redirect:/proveedores/lista";
         } catch (RuntimeException ex) {
             // Vuelve a cargar la lista y muestra el error directamente en la vista
-            List<Proveedores> lista = proveedoresService.listaeProveedores();
+            List<Proveedores> lista = proveedoresService.listadeProveedores();
             model.addAttribute("listaProveedores", lista);
             redirectAttributes.addFlashAttribute("error", "No se pudo eliminar el proveedor");
             return "listaProveedores"; // Asegúrate de usar el nombre correcto de tu plantilla

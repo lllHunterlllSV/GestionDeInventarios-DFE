@@ -3,9 +3,6 @@ package com.gfu.gestioninventario.Services;
 import com.gfu.gestioninventario.Models.Categoria;
 import com.gfu.gestioninventario.Repository.CategoriaRepository;
 import com.gfu.gestioninventario.Repository.ProductoRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +17,6 @@ public class CategoriaService {
     private CategoriaRepository categoriaRepository;
     @Autowired
     private ProductoRepository productoRepository;
-    @PersistenceContext
-    EntityManager entityManager;
 
     public Categoria obtenerCategorias(String categoria) {
         return categoriaRepository.findByNombreIgnoreCase(categoria);
@@ -47,9 +42,5 @@ public class CategoriaService {
         }
         categoriaRepository.delete(cat);
 
-    }
-    /// buscar por categoria
-    public List<Categoria> buscarCategoriasPorKeyword(String keyword) {
-        return categoriaRepository.buscarPorKeyword(keyword);
     }
 }

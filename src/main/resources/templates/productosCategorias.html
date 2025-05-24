@@ -32,13 +32,9 @@
         <h1 class="text-2xl font-semibold mb-6 text-gray-800 text-center">
           Control de Inventarios - Categorías de Productos
         </h1>
-
-        <form class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
-              id="searchForm"
-              th:action="@{/productos/categorias}"
-              method="get">
+  <form class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6" id="searchForm" onsubmit="return false;">
     <div class="flex items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 flex-grow max-w-xs min-w-0">
-      <input aria-label="Buscar categorías" autocomplete="off" class="px-3 py-2 w-full text-gray-700 placeholder-gray-400 focus:outline-none text-sm" id="searchInput" name="keyword" th:value="@{keyword}" placeholder="Buscar categorías..." type="text"/>
+      <input aria-label="Buscar categorías" autocomplete="off" class="px-3 py-2 w-full text-gray-700 placeholder-gray-400 focus:outline-none text-sm" id="searchInput" placeholder="Buscar categorías..." type="text"/>
 
       <button aria-label="Limpiar búsqueda" class="px-2 text-gray-400 hover:text-gray-600 focus:outline-none" id="clearSearch" title="Limpiar búsqueda" type="button">
         <i class="fas fa-times fa-sm">
@@ -89,8 +85,8 @@
             <i class="fas fa-plus mr-2"></i> AGREGAR PRODUCTO
           </a>
 
-          <button onclick="agregarCategoria()" class="inline-flex items-center px-5 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none text-sm">
-            <i class="fas fa-plus mr-2"></i> AGREGAR CATEGORIA
+          <button onclick="agregarCategoria()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            <i class="fas fa-plus mr-2"></i> Agregar Categoría
           </button>
         </div>
 
