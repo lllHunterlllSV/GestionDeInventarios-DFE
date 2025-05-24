@@ -1,6 +1,6 @@
-/*
-package com.gfu.gestioninventario.security;
 
+package com.gfu.gestioninventario.security;
+/*
 import com.gfu.gestioninventario.Models.Usuarios;
 
 import java.util.Collection;
@@ -52,6 +52,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled(){
         return true;
+    }
+
+    public Usuarios getUsuario() {
+        return usuario;
     }
 }
 */

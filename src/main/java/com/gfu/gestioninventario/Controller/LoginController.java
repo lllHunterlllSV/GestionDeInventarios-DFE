@@ -1,6 +1,6 @@
-/*
-package com.gfu.gestioninventario.Controller;
 
+package com.gfu.gestioninventario.Controller;
+/*
 import com.gfu.gestioninventario.Models.Usuarios;
 import com.gfu.gestioninventario.Services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
