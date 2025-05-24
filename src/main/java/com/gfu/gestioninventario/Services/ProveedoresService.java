@@ -30,7 +30,7 @@ public class ProveedoresService implements ProveedoresServiceInt{
 
 
     //listar proveedores
-    public List<Proveedores> listaeProveedores() {
+    public List<Proveedores> listadeProveedores() {
         return proveedoresRepository.findAll();
     }
 

@@ -126,6 +126,9 @@ public class ProductoService implements ProductoServiceInt{
     }
 
 
+    public List<Producto> findByProveedorId(Integer proveedorId) {
+        return productoRepository.findByProveedorProveedorId(proveedorId);
+    }
 
 
 

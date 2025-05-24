@@ -1,0 +1,178 @@
+<div th:fragment="modalNuevaOrden">
+    <!-- Fondo oscuro con transición -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300 ease-out"></div>
+
+    <!-- Modal con animación -->
+    <div id="modalNuevaOrden" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden opacity-0 scale-95 transition-all duration-300 ease-out" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative animate-fade-in-up">
+
+            <button type="button" onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-600 hover:text-red-600 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Registrar Nueva Orden de Compra</h2>
+
+            <form id="formOrden" th:action="@{/compras/ordenCompleta}" method="post">
+                <!-- Datos generales -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                        <select name="proveedorId" id="proveedorId" class="w-full border border-gray-300 rounded px-3 py-2" onchange="cargarProductosPorProveedor()">
+                            <option value="" disabled selected>Seleccione un proveedor</option>
+                            <option th:each="prov : ${proveedores}" th:value="${prov.proveedorId}" th:text="${prov.nombreProveedor}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Orden</label>
+                        <input type="date" name="fechaOrden" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento (opcional)</label>
+                        <input type="date" name="fechaVencimiento" class="w-full border border-gray-300 rounded px-3 py-2">
+                    </div>
+                </div>
+
+                <!-- Agregar producto -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
+                        <select id="productoId" class="w-full border border-gray-300 rounded px-2 py-2">
+                            <option value="" disabled selected>Seleccione un producto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                        <input type="number" id="cantidad" min="1" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario</label>
+                        <input type="number" id="precio" step="0.01" min="0.01" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                    </div>
+                    <div>
+                        <button type="button" onclick="agregarProducto()" class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700 transition">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de productos -->
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full table-auto text-sm text-left text-gray-700" id="tablaProductos">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 font-semibold">Producto</th>
+                            <th class="px-4 py-2 font-semibold">Cantidad</th>
+                            <th class="px-4 py-2 font-semibold">Precio Unitario</th>
+                            <th class="px-4 py-2 font-semibold text-center">Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <input type="hidden" name="usuarioId" th:value="${usuarioId}"/>
+                <input type="hidden" name="tipoMovimientoId" value="1"/>
+
+                <div class="text-right mt-6">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow">
+                        <i class="fas fa-save mr-2"></i> Guardar Orden
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script del modal + JS dinámico -->
+    <script>
+        function abrirModal() {
+            const modal = document.getElementById('modalNuevaOrden');
+            const backdrop = document.getElementById('modalBackdrop');
+            modal.classList.remove('hidden');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modalNuevaOrden');
+            const backdrop = document.getElementById('modalBackdrop');
+            modal.classList.add('opacity-0', 'scale-95');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+
+        function cargarProductosPorProveedor() {
+            const proveedorId = document.getElementById('proveedorId').value;
+            const selectProducto = document.getElementById('productoId');
+            fetch(`/compras/productos/proveedor/${proveedorId}`)
+                .then(res => res.json())
+                .then(productos => {
+                    selectProducto.innerHTML = '<option disabled selected>Seleccione un producto</option>';
+                    productos.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.productoId;
+                        option.text = p.nombre;
+                        selectProducto.appendChild(option);
+                    });
+                });
+        }
+
+        function agregarProducto() {
+            const productoSelect = document.getElementById('productoId');
+            const productoId = productoSelect.value;
+            const productoNombre = productoSelect.options[productoSelect.selectedIndex].text;
+            const cantidad = document.getElementById('cantidad').value;
+            const precio = document.getElementById('precio').value;
+
+            if (!productoId || !cantidad || !precio) {
+                Swal.fire({ icon: 'warning', text: 'Por favor complete todos los campos del producto.' });
+                return;
+            }
+
+            const tabla = document.getElementById('tablaProductos');
+            const index = tabla.rows.length - 1;
+            const row = tabla.insertRow();
+            row.innerHTML = `
+    <td class='border px-4 py-1'>${productoNombre}
+        <input type='hidden' name='detalles[${index}].producto.productoId' value='${productoId}'/>
+    </td>
+    <td class='border px-4 py-1'>${cantidad}
+        <input type='hidden' name='detalles[${index}].cantidad' value='${cantidad}'/>
+    </td>
+    <td class='border px-4 py-1'>${precio}
+        <input type='hidden' name='detalles[${index}].precioUnitario' value='${precio}'/>
+    </td>
+    <input type='hidden' name='usuarioId' value='2'/>
+    <td class='border px-4 py-1 text-center'>
+        <button type='button' onclick='this.closest("tr").remove()' class='text-red-600'>Eliminar</button>
+    </td>`;
+
+            document.getElementById('cantidad').value = '';
+            document.getElementById('precio').value = '';
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("formOrden");
+
+            form.addEventListener("submit", function (e) {
+                console.log("======== CAMPOS ENVIADOS ========");
+                const elementos = form.querySelectorAll("input, select, textarea");
+                elementos.forEach(el => {
+                    if (el.name) {
+                        console.log(`${el.name} = ${el.value}`);
+                    }
+                });
+                console.log("=================================");
+
+                // Opcional: prevenir envío si estás solo debuggeando
+                // e.preventDefault();
+            });
+        });
+
+    </script>
+</div>
