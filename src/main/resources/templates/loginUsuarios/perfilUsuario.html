@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editable User Profile - Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body class="bg-gray-100">
+<div class="flex flex-1 min-h-0">
+    <div th:insert="~{fragments/fragmentoSidebar :: sidebar}"></div>
+
+    <div class="flex flex-col flex-1 md:pl-64 min-h-screen">
+        <div th:insert="~{fragments/fragmentoNavbar :: navbar}"></div>
+
+        <section class="mb-12 px-4" id="gestion-usuarios">
+            <div class="mt-10 text-center mb-6">
+                <h3 class="text-2xl font-semibold text-gray-800">
+                    Gestion de Usuarios
+                </h3>
+            </div>
+
+            <!-- Card Container -->
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+                <!-- Card Header -->
+                <div class="bg-indigo-500 px-6 py-4 flex justify-between items-center">
+                    <h4 class="text-lg font-semibold text-white">User Profile</h4>
+                    <button aria-label="Edit user information"
+                            class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white"
+                            id="editButton" type="button">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit
+                    </button>
+                </div>
+
+                <!-- Card Body -->
+                <form id="userForm" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="usuario">
+                            Usuario
+                        </label>
+                        <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
+                               id="usuario" name="usuario" readonly="" type="text" th:field="*{usuario.usuario}"/>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="contraseña">
+                            Contraseña
+                        </label>
+                        <div class="relative">
+                            <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
+                                   id="contraseña" name="contraseña" readonly="" type="password" th:field="*{usuario.contrasena}"/>
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="estado">
+                            Estado
+                        </label>
+                        <input aria-readonly="true"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
+                               id="estado" name="estado" readonly="" type="text"  th:value="${usuario.estado} ? 'ACTIVO' : 'INACTIVO'" />
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="rol_id">
+                            Rol
+                        </label>
+                        <input aria-readonly="true"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
+                               id="rol_id" name="rol_id" readonly="" type="text" th:field="*{usuario.roles.tipo_rol}"/>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="nombreCompleto">
+                            Nombre Completo
+                        </label>
+                        <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
+                               id="nombreCompleto" name="nombreCompleto" readonly="" type="text" th:field="*{usuario.nombreCompleto}"/>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1" for="email">
+                            Email
+                        </label>
+                        <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
+                               id="email" name="email" readonly="" type="email" th:field="*{usuario.email}"/>
+                    </div>
+
+                    <!-- Form Actions (hidden by default, shown when editing) -->
+                    <div class="sm:col-span-2 flex justify-end space-x-4 hidden" id="formActions">
+                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500" id="cancelButton">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const form = document.getElementById('userForm');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('contraseña');
+        const editButton = document.getElementById('editButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const formActions = document.getElementById('formActions');
+        const readonlyInputs = form.querySelectorAll('input[readonly]:not([aria-readonly="true"])');
+
+        // Toggle password visibility
+        togglePasswordBtn.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePasswordBtn.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+
+        // Enable/disable form editing
+        editButton.addEventListener('click', () => {
+            readonlyInputs.forEach(input => {
+                input.readOnly = !input.readOnly;
+                input.classList.toggle('bg-gray-100');
+                input.classList.toggle('bg-white');
+                input.classList.toggle('cursor-not-allowed');
+                input.classList.toggle('cursor-auto');
+            });
+
+            formActions.classList.toggle('hidden');
+            editButton.classList.toggle('hidden');
+        });
+
+        // Cancel editing
+        cancelButton.addEventListener('click', () => {
+            readonlyInputs.forEach(input => {
+                input.readOnly = true;
+                input.classList.add('bg-gray-100');
+                input.classList.remove('bg-white');
+                input.classList.add('cursor-not-allowed');
+                input.classList.remove('cursor-auto');
+            });
+
+            formActions.classList.add('hidden');
+            editButton.classList.remove('hidden');
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const userData = {};
+            formData.forEach((val, key) => {
+                userData[key] = val;
+            });
+
+            alert('Profile saved:\n' + JSON.stringify(userData, null, 2));
+
+            // Return to read-only mode after save
+            readonlyInputs.forEach(input => {
+                input.readOnly = true;
+                input.classList.add('bg-gray-100');
+                input.classList.remove('bg-white');
+                input.classList.add('cursor-not-allowed');
+                input.classList.remove('cursor-auto');
+            });
+
+            formActions.classList.add('hidden');
+            editButton.classList.remove('hidden');
+        });
+    })();
+</script>
+</body>
+</html>
