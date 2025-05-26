@@ -1,9 +1,8 @@
 package com.gfu.gestioninventario.Services;
 
-import com.gfu.gestioninventario.Models.DetalleOrdenCompra;
-import com.gfu.gestioninventario.Models.Lote;
-import com.gfu.gestioninventario.Repository.LoteRepository;
-import com.gfu.gestioninventario.Repository.OrdenCompraRepository;
+import com.gfu.gestioninventario.Models.*;
+import com.gfu.gestioninventario.Repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,21 @@ public class LoteService {
     @Autowired
     private LoteRepository loteRepository;
 
+    @Autowired
+    private OrdenCompraRepository ordenCompraRepository;
+
+    @Autowired
+    private DetalleOrdenCompraRepository detalleOrdenRepository;
+
+    @Autowired
+    private ControlMovimientosRepository controlMovimientosRepository;
+
+    @Autowired
+    private TipoMovimientoRepository tipoMovimientoRepository;
+
+
     public void registrarLoteCompleto(Integer proveedorId, Date fechaOrden, List<DetalleOrdenCompra> detalles,
-                                      Date fechaVencimientoGeneral, Integer usuarioId, Integer tipoMovimientoId) {
+                                      Integer usuarioId, Integer tipoMovimientoId) {
         try {
             Integer ordenId = jdbcTemplate.queryForObject(
                     "EXEC sp_CrearOrdenCompra @proveedor_id = ?, @fecha_orden = ?, @estado = ?",
@@ -43,6 +55,7 @@ public class LoteService {
                     productoId = detalle.getProducto().getProductoId();
                     cantidad = detalle.getCantidad();
                     BigDecimal precio = detalle.getPrecioUnitario();
+                    Date fechaVencimiento = detalle.getFechaVencimiento();
 
                     System.out.println("Insertando detalle: productoId=" + productoId + ", cantidad=" + cantidad + ", precio=" + precio);
 
@@ -57,7 +70,7 @@ public class LoteService {
 
                     int filasLote = jdbcTemplate.update(
                             "EXEC sp_RegistrarLote ?, ?, ?, ?, ?, ?, ?, ?",
-                            ordenId, productoId, cantidad, new Date(), fechaVencimientoGeneral, precio, usuarioId, tipoMovimientoId
+                            ordenId, productoId, cantidad, new Date(), fechaVencimiento, precio, usuarioId, tipoMovimientoId
                     );
 
                     if (filasLote == 0) {
@@ -87,10 +100,79 @@ public class LoteService {
             System.err.println("Mensaje: " + ex.getMessage());
             System.err.println("═══════════════════════════════════════════════════");
             ex.printStackTrace(System.err);
-            System.err.println("\n\n");
             throw new RuntimeException("Error en registrarLoteCompleto: " + ex.getMessage(), ex);
         }
     }
+
+
+    @Transactional
+    public void editarOrdenCompra(Integer ordenId, Date nuevaFechaOrden, List<DetalleOrdenCompra> nuevosDetalles,
+                                  Integer usuarioId, Integer tipoMovimientoId,
+                                  String accionFinal) {
+
+        OrdenCompra orden = ordenCompraRepository.findById(ordenId)
+                .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
+
+        if (!EstadoOrden.PENDIENTE.equals(orden.getEstado())) {
+            throw new IllegalStateException("Solo se pueden editar órdenes pendientes");
+        }
+
+        // Eliminar movimientos anteriores
+        for (Lote lote : orden.getLotes()) {
+            controlMovimientosRepository.deleteByLoteId(lote.getLoteId());
+        }
+
+        // Eliminar detalles y lotes anteriores
+        detalleOrdenRepository.deleteByOrdenId(ordenId);
+        loteRepository.deleteByOrdenId(ordenId);
+
+        // Actualizar fecha
+        orden.setFechaOrden(nuevaFechaOrden);
+
+        TipoMovimiento tipoMovimiento = tipoMovimientoRepository.findById(tipoMovimientoId)
+                .orElseThrow(() -> new RuntimeException("Tipo de movimiento no encontrado"));
+
+        for (DetalleOrdenCompra nuevoDetalle : nuevosDetalles) {
+            nuevoDetalle.setOrden(orden);
+            detalleOrdenRepository.save(nuevoDetalle);
+
+            Lote nuevoLote = new Lote();
+            nuevoLote.setOrden(orden);
+            nuevoLote.setProducto(nuevoDetalle.getProducto());
+            nuevoLote.setCantidad(nuevoDetalle.getCantidad());
+            nuevoLote.setCostoUnitario(nuevoDetalle.getPrecioUnitario());
+            nuevoLote.setFechaIngreso(new Date());
+            nuevoLote.setFechaVencimiento(nuevoDetalle.getFechaVencimiento());
+
+            // Estado del lote según acción
+            boolean activo = !"CANCELAR".equalsIgnoreCase(accionFinal);
+            nuevoLote.setEstado(activo);
+
+            loteRepository.save(nuevoLote);
+
+            ControlMovimientos movimiento = new ControlMovimientos();
+            movimiento.setLote(nuevoLote);
+            movimiento.setCantidad(nuevoDetalle.getCantidad());
+            movimiento.setFechaMovimiento(new Date());
+            movimiento.setUsuario(null); // O usuarioId si lo quieres usar
+            movimiento.setTipoMovimiento(tipoMovimiento);
+            controlMovimientosRepository.save(movimiento);
+        }
+
+        // Cambiar estado de la orden si se indicó acción
+        if ("RECIBIR".equalsIgnoreCase(accionFinal)) {
+            orden.setEstado(EstadoOrden.RECIBIDO);
+        } else if ("CANCELAR".equalsIgnoreCase(accionFinal)) {
+            orden.setEstado(EstadoOrden.CANCELADO);
+        }
+
+        ordenCompraRepository.save(orden);
+    }
+
+
+
+
+
 
 
 

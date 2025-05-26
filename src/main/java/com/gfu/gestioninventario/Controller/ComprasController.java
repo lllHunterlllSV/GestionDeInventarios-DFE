@@ -2,11 +2,10 @@ package com.gfu.gestioninventario.Controller;
 
 
 
+import com.gfu.gestioninventario.DTOs.DetalleOrdenDTO;
 import com.gfu.gestioninventario.DTOs.OrdenCompletaDTO;
-import com.gfu.gestioninventario.Models.DetalleOrdenCompra;
-import com.gfu.gestioninventario.Models.Lote;
-import com.gfu.gestioninventario.Models.OrdenCompra;
-import com.gfu.gestioninventario.Models.Producto;
+import com.gfu.gestioninventario.DTOs.ProductoDTO;
+import com.gfu.gestioninventario.Models.*;
 import com.gfu.gestioninventario.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,12 +14,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/compras")
@@ -49,17 +53,149 @@ public class ComprasController {
             loteService.registrarLoteCompleto(
                     form.getProveedorId(),
                     form.getFechaOrden(),
-                    form.getDetalles(),
-                    form.getFechaVencimiento(),
+                    form.getDetalles(), // Aquí ya vienen las fechas individuales por detalle
                     form.getUsuarioId(),
                     form.getTipoMovimientoId()
             );
             return "redirect:/compras/lista?exito=La orden fue registrada correctamente";
         } catch (Exception e) {
-            e.printStackTrace(); // opcional para ver error en consola
+            e.printStackTrace(); // útil para depuración
             return "redirect:/compras/lista?error=Ocurrió un problema al registrar la orden";
         }
     }
+
+    @GetMapping("/eliminar/{ordenId}")
+    public String eliminarOrden(@PathVariable Integer ordenId) {
+        try {
+            OrdenCompra orden = ordenCompraService.obtenerPorId(ordenId);
+
+            if (orden.getEstado() == EstadoOrden.PENDIENTE) {
+                ordenCompraService.eliminarOrdenCompleta(ordenId);
+                return "redirect:/compras/lista?exito=Orden eliminada correctamente";
+            } else {
+                return "redirect:/compras/lista?error=Solo puede eliminar órdenes en estado PENDIENTE";
+            }
+        } catch (Exception e) {
+            return "redirect:/compras/lista?error=" + e.getMessage();
+        }
+    }
+
+
+
+    @GetMapping("/api/detalle/{ordenId}")
+    public ResponseEntity<DetalleOrdenDTO> obtenerDetalleOrden(@PathVariable Integer ordenId) {
+        try {
+            OrdenCompra orden = ordenCompraService.obtenerPorId(ordenId);
+            if (orden == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            DetalleOrdenDTO dto = new DetalleOrdenDTO();
+            dto.setProveedor(orden.getProveedor().getNombreProveedor());
+            dto.setProveedorId(orden.getProveedor().getProveedorId());
+            dto.setFechaOrden(orden.getFechaOrden());
+
+            List<DetalleOrdenDTO.ItemDetalleDTO> lista = new ArrayList<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+
+            for (DetalleOrdenCompra d : orden.getDetalles()) {
+                DetalleOrdenDTO.ItemDetalleDTO item = new DetalleOrdenDTO.ItemDetalleDTO();
+                item.setProducto(d.getProducto() != null ? d.getProducto().getNombre() : "Desconocido");
+                item.setProductoId(d.getProducto().getProductoId());
+                item.setCantidad(d.getCantidad());
+                item.setPrecioUnitario(d.getPrecioUnitario());
+
+                // Buscar el lote que coincide con este producto y esta orden
+                Optional<Lote> loteRelacionado = orden.getLotes()
+                        .stream()
+                        .filter(l ->
+                                l.getProducto().getProductoId().equals(d.getProducto().getProductoId())
+                                        && l.getOrden().getOrdenId().equals(orden.getOrdenId())
+                        )
+                        .findFirst();
+
+                if (loteRelacionado.isPresent()) {
+                    Date fechaVenc = loteRelacionado.get().getFechaVencimiento();
+                    item.setFechaVencimiento(fechaVenc != null ? new SimpleDateFormat("yyyy-MM-dd").format(fechaVenc) : "");
+                } else {
+                    item.setFechaVencimiento("");
+                }
+
+                lista.add(item);
+            }
+
+            dto.setDetalles(lista);
+            return ResponseEntity.ok(dto);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error en obtenerDetalleOrden:");
+            System.err.println("Mensaje: " + e.getMessage());
+            e.printStackTrace(); // <--- Deja esto
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+    }
+
+
+
+    @PostMapping("/editar/{ordenId}")
+    public String editarOrden(@PathVariable Integer ordenId,
+                              @ModelAttribute OrdenCompletaDTO dto) {
+        try {
+            loteService.editarOrdenCompra(
+                    ordenId,
+                    dto.getFechaOrden(),
+                    dto.getDetalles(),
+                    dto.getUsuarioId(),
+                    dto.getTipoMovimientoId(),
+                    null // solo edición normal
+            );
+            return "redirect:/compras/lista?exito=Orden editada correctamente";
+        } catch (Exception e) {
+            return "redirect:/compras/lista?error=Error al editar la orden";
+        }
+    }
+
+    @PostMapping("/recibir/{ordenId}")
+    public ResponseEntity<?> recibirOrden(@PathVariable Integer ordenId,
+                                          @ModelAttribute OrdenCompletaDTO dto) {
+        try {
+            loteService.editarOrdenCompra(
+                    ordenId,
+                    dto.getFechaOrden(),
+                    dto.getDetalles(),
+                    dto.getUsuarioId(),
+                    dto.getTipoMovimientoId(),
+                    "RECIBIR"
+            );
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/cancelar/{ordenId}")
+    public ResponseEntity<?> cancelarOrden(@PathVariable Integer ordenId,
+                                           @ModelAttribute OrdenCompletaDTO dto) {
+        try {
+            loteService.editarOrdenCompra(
+                    ordenId,
+                    dto.getFechaOrden(),
+                    dto.getDetalles(),
+                    dto.getUsuarioId(),
+                    dto.getTipoMovimientoId(),
+                    "CANCELAR"
+            );
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+
 
 
 
@@ -125,8 +261,33 @@ public class ComprasController {
 
     @GetMapping("/productos/proveedor/{id}")
     @ResponseBody
-    public List<Producto> listarProductosPorProveedor(@PathVariable Integer id) {
-        return productoService.findByProveedorId(id);
+    public List<ProductoDTO> listarProductosPorProveedor(@PathVariable Integer id) {
+        return productoService.obtenerProductosPorProveedor(id);
     }
+
+/*
+    @GetMapping("/api/detalle/{ordenId}")
+    @ResponseBody
+    public DetalleOrdenDTO obtenerDetalleOrden(@PathVariable Integer ordenId) {
+        OrdenCompra orden = ordenCompraService.obtenerPorId(ordenId);
+        List<DetalleOrdenCompra> detalles = detalleOrdenCompraService.obtenerPorOrden(ordenId);
+
+        DetalleOrdenDTO dto = new DetalleOrdenDTO();
+        dto.setProveedor(orden.getProveedor().getNombreProveedor());
+        dto.setFechaOrden(orden.getFechaOrden());
+        dto.setFechaVencimiento(orden.getFechaVencimiento());
+
+        List<DetalleOrdenDTO.ItemDetalleDTO> detalleItems = detalles.stream().map(d -> {
+            DetalleOrdenDTO.ItemDetalleDTO item = new DetalleOrdenDTO.ItemDetalleDTO();
+            item.setProducto(d.getProducto().getNombre());
+            item.setCantidad(d.getCantidad());
+            item.setPrecioUnitario(d.getPrecioUnitario());
+            return item;
+        }).toList();
+
+        dto.setDetalles(detalleItems);
+        return dto;
+    }*/
+
 
 }

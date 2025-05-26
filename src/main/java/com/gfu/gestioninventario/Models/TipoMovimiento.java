@@ -26,6 +26,9 @@ public class TipoMovimiento {
 
     public TipoMovimiento() {}
 
+    public TipoMovimiento(int i) {
+    }
+
     public String getMovimiento() {
         return movimiento;
     }

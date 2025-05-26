@@ -147,6 +147,23 @@
               th:text="${medida.medida}"></option>
     </select>
   </div>
+  <div>
+    <label for="precioVenta" class="block text-gray-700 font-medium mb-1">Precio de Venta</label>
+    <div class="relative">
+      <span class="absolute left-3 top-2.5 text-gray-500 font-semibold">$</span>
+      <input
+              type="number"
+              id="precioVenta"
+              th:field="*{precioVenta}"
+              step="0.01"
+              min="0"
+              placeholder="Ejemplo: 5.50"
+              required
+              class="w-full border border-gray-300 rounded-md pl-6 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+
 
 
 
