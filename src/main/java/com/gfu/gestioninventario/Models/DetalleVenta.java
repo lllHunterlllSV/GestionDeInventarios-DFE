@@ -32,6 +32,11 @@ public class DetalleVenta {
     @Column(name = "precio_unitario")
     private BigDecimal precioUnitario;
 
+
+    @ManyToOne
+    @JoinColumn(name = "lote_id", referencedColumnName = "lote_id", nullable = false)
+    private Lote lote;
+
     //CONSTRUCTORES
     //DEFAULT
     public DetalleVenta() {
@@ -96,5 +101,13 @@ public class DetalleVenta {
 
     public void setDevoluciones(List<Devolucion> devoluciones) {
         this.devoluciones = devoluciones;
+    }
+
+    public Lote getLote() {
+        return lote;
+    }
+
+    public void setLote(Lote lote) {
+        this.lote = lote;
     }
 }

@@ -1,8 +1,10 @@
 package com.gfu.gestioninventario.Models;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -94,6 +96,20 @@ public class DetalleOrdenCompra {
 
     public void setDevoluciones(List<DevolucionCompra> devoluciones) {
         this.devoluciones = devoluciones;
+    }
+
+    @Transient
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fechaVencimiento;
+
+
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
     }
 
 }

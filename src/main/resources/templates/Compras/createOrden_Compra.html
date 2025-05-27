@@ -24,20 +24,17 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Orden</label>
-                        <input type="date" name="fechaOrden" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                        <input type="date" name="fechaOrden" id="fechaOrden" class="w-full border border-gray-300 rounded px-3 py-2" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento (opcional)</label>
-                        <input type="date" name="fechaVencimiento" class="w-full border border-gray-300 rounded px-3 py-2">
-                    </div>
+
                 </div>
 
                 <!-- Agregar producto -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 items-end">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
                         <select id="productoId" class="w-full border border-gray-300 rounded px-2 py-2">
-                            <option value="" disabled selected>Seleccione un producto</option>
+                            <option value="" disabled selected hidden>Seleccione un producto</option>
                         </select>
                     </div>
                     <div>
@@ -46,8 +43,21 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario</label>
-                        <input type="number" id="precio" step="0.01" min="0.01" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-gray-500 font-semibold">$</span>
+                            <input type="number"
+                                   id="precio"
+                                   step="0.01"
+                                   min="0.01"
+                                   class="w-full border border-gray-300 rounded pl-6 pr-2 py-2"/>
+                        </div>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento</label>
+                        <input type="date" id="fechaVencimiento" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                    </div>
+
+
                     <div>
                         <button type="button" onclick="agregarProducto()" class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700 transition">
                             <i class="fas fa-plus"></i> Agregar
@@ -63,12 +73,20 @@
                             <th class="px-4 py-2 font-semibold">Producto</th>
                             <th class="px-4 py-2 font-semibold">Cantidad</th>
                             <th class="px-4 py-2 font-semibold">Precio Unitario</th>
+                            <th class="px-4 py-2 font-semibold">Fecha Vencimiento</th>
                             <th class="px-4 py-2 font-semibold text-center">Acción</th>
                         </tr>
                         </thead>
+
                         <tbody></tbody>
                     </table>
                 </div>
+                <!-- Subtotal -->
+                <div class="text-right mt-4 mr-2">
+                    <span class="text-lg font-semibold text-gray-700">Subtotal: </span>
+                    <span id="subtotalTexto" class="text-lg font-bold text-black-700">$0.00</span>
+                </div>
+
 
                 <input type="hidden" name="usuarioId" th:value="${usuarioId}"/>
                 <input type="hidden" name="tipoMovimientoId" value="1"/>
@@ -84,9 +102,27 @@
 
     <!-- Script del modal + JS dinámico -->
     <script>
+
+        let proveedorAnterior = "";
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const proveedorId = document.getElementById('proveedorId');
+            proveedorAnterior = proveedorId.value;
+        });
+
         function abrirModal() {
             const modal = document.getElementById('modalNuevaOrden');
             const backdrop = document.getElementById('modalBackdrop');
+            const fechaOrdenInput = document.getElementById('fechaOrden');
+
+            if (fechaOrdenInput) {
+                const hoy = new Date();
+                const yyyy = hoy.getFullYear();
+                const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+                const dd = String(hoy.getDate()).padStart(2, '0');
+                fechaOrdenInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+
             modal.classList.remove('hidden');
             backdrop.classList.remove('hidden');
             setTimeout(() => {
@@ -94,6 +130,7 @@
                 modal.classList.add('opacity-100', 'scale-100');
             }, 10);
         }
+
 
         function cerrarModal() {
             const modal = document.getElementById('modalNuevaOrden');
@@ -108,6 +145,35 @@
 
         function cargarProductosPorProveedor() {
             const proveedorId = document.getElementById('proveedorId').value;
+            const tabla = document.getElementById('tablaProductos').querySelector("tbody");
+
+            if (tabla.rows.length > 0) {
+                Swal.fire({
+                    title: '¿Cambiar de proveedor?',
+                    text: 'Se eliminarán todos los productos agregados.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, cambiar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        tabla.innerHTML = ''; // Limpia todos los productos
+                        proveedorAnterior = proveedorId; // Guardar el nuevo proveedor como actual
+                        cargarProductosReal(proveedorId);
+                    } else {
+                        // Revertimos al proveedor anterior
+                        document.getElementById('proveedorId').value = proveedorAnterior;
+                    }
+                });
+            } else {
+                proveedorAnterior = proveedorId;
+                cargarProductosReal(proveedorId);
+            }
+        }
+
+
+        function cargarProductosReal(proveedorId) {
             const selectProducto = document.getElementById('productoId');
             fetch(`/compras/productos/proveedor/${proveedorId}`)
                 .then(res => res.json())
@@ -122,12 +188,19 @@
                 });
         }
 
+
         function agregarProducto() {
             const productoSelect = document.getElementById('productoId');
             const productoId = productoSelect.value;
             const productoNombre = productoSelect.options[productoSelect.selectedIndex].text;
-            const cantidad = document.getElementById('cantidad').value;
-            const precio = document.getElementById('precio').value;
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            const precio = parseFloat(document.getElementById('precio').value);
+            const fechaVencimiento = document.getElementById('fechaVencimiento').value;
+
+            if (!productoId || productoId === "") {
+                Swal.fire({ icon: 'warning', text: 'Por favor seleccione un producto válido.' });
+                return;
+            }
 
             if (!productoId || !cantidad || !precio) {
                 Swal.fire({ icon: 'warning', text: 'Por favor complete todos los campos del producto.' });
@@ -135,31 +208,107 @@
             }
 
             const tabla = document.getElementById('tablaProductos');
-            const index = tabla.rows.length - 1;
-            const row = tabla.insertRow();
+            const filas = tabla.querySelectorAll("tbody tr");
+
+            for (let fila of filas) {
+                const inputId = fila.querySelector("input[name*='producto.productoId']");
+                if (inputId && inputId.value === productoId) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Producto ya agregado',
+                        text: 'Este producto ya está en la lista. Si desea cambiar la cantidad o el precio, edítelo directamente en la tabla.',
+                    });
+                    return;
+                }
+            }
+
+            const index = filas.length;
+            const row = tabla.querySelector("tbody").insertRow();
+
             row.innerHTML = `
-    <td class='border px-4 py-1'>${productoNombre}
-        <input type='hidden' name='detalles[${index}].producto.productoId' value='${productoId}'/>
-    </td>
-    <td class='border px-4 py-1'>${cantidad}
-        <input type='hidden' name='detalles[${index}].cantidad' value='${cantidad}'/>
-    </td>
-    <td class='border px-4 py-1'>${precio}
-        <input type='hidden' name='detalles[${index}].precioUnitario' value='${precio}'/>
-    </td>
-    <input type='hidden' name='usuarioId' value='2'/>
-    <td class='border px-4 py-1 text-center'>
-        <button type='button' onclick='this.closest("tr").remove()' class='text-red-600'>Eliminar</button>
-    </td>`;
+<td class='border px-4 py-1'>
+    ${productoNombre}
+    <input type='hidden' name='detalles[${index}].producto.productoId' value='${productoId}'/>
+</td>
+<td class='border px-4 py-1'>
+    <div class="flex items-center gap-2">
+        <button type='button'
+                class='bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded-full shadow flex items-center justify-center'
+                onclick='ajustarCantidad(${index}, 1)'>
+            <i class="fas fa-plus text-xs"></i>
+        </button>
+        <span id='cantidadTexto-${index}' class='text-gray-800 font-semibold'>${cantidad}</span>
+        <button type='button'
+                class='bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded-full shadow flex items-center justify-center'
+                onclick='ajustarCantidad(${index}, -1)'>
+            <i class="fas fa-minus text-xs"></i>
+        </button>
+        <input type='hidden' id='cantidadInput-${index}' name='detalles[${index}].cantidad' value='${cantidad}'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <div class="relative">
+        <span class="absolute left-2 top-1.5 text-gray-500 font-semibold">$</span>
+        <input type='number'
+               name='detalles[${index}].precioUnitario'
+               value='${precio}'
+               step='0.01'
+               min='0.01'
+               class='pl-6 border border-gray-300 rounded px-2 py-1 w-24'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <input type='date' class='border border-gray-300 rounded px-2 py-1 w-full' name='detalles[${index}].fechaVencimiento' value='${fechaVencimiento}' readonly/>
+</td>
+<td class='border px-4 py-1 text-center'>
+    <button type='button' onclick='this.closest("tr").remove(); actualizarSubtotal();' class='text-red-600'>Eliminar</button>
+</td>`;
+
 
             document.getElementById('cantidad').value = '';
             document.getElementById('precio').value = '';
+            actualizarSubtotal();
+
         }
+
+
+        function ajustarCantidad(index, delta) {
+            const cantidadInput = document.getElementById(`cantidadInput-${index}`);
+            const cantidadTexto = document.getElementById(`cantidadTexto-${index}`);
+            let nuevaCantidad = parseInt(cantidadInput.value) + delta;
+            if (nuevaCantidad < 1) nuevaCantidad = 1;
+            cantidadInput.value = nuevaCantidad;
+            cantidadTexto.textContent = nuevaCantidad;
+            actualizarSubtotal();
+        }
+
+
+
 
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("formOrden");
+            const fechaOrdenInput = document.querySelector("input[name='fechaOrden']");
+            if (fechaOrdenInput) {
+                const hoy = new Date();
+                const yyyy = hoy.getFullYear();
+                const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+                const dd = String(hoy.getDate()).padStart(2, '0');
+                fechaOrdenInput.value = `${yyyy}-${mm}-${dd}`;
+            }
 
             form.addEventListener("submit", function (e) {
+                const filas = document.querySelectorAll("#tablaProductos tbody tr");
+
+                if (filas.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin productos',
+                        text: 'Debe agregar al menos un producto para registrar la orden.'
+                    });
+                    return;
+                }
+
                 console.log("======== CAMPOS ENVIADOS ========");
                 const elementos = form.querySelectorAll("input, select, textarea");
                 elementos.forEach(el => {
@@ -168,11 +317,35 @@
                     }
                 });
                 console.log("=================================");
+            });
 
-                // Opcional: prevenir envío si estás solo debuggeando
-                // e.preventDefault();
+            // Nuevo: actualiza subtotal al modificar el precio unitario
+            document.addEventListener("input", function (e) {
+                if (e.target && e.target.name.includes("precioUnitario")) {
+                    actualizarSubtotal();
+                }
             });
         });
+
+
+        function actualizarSubtotal() {
+            let subtotal = 0.0;
+            const filas = document.querySelectorAll("#tablaProductos tbody tr");
+
+            filas.forEach((fila, index) => {
+                const precioInput = fila.querySelector(`input[name='detalles[${index}].precioUnitario']`);
+                const cantidadInput = document.getElementById(`cantidadInput-${index}`);
+
+                if (precioInput && cantidadInput) {
+                    const precio = parseFloat(precioInput.value) || 0;
+                    const cantidad = parseInt(cantidadInput.value) || 0;
+                    subtotal += precio * cantidad;
+                }
+            });
+
+            document.getElementById('subtotalTexto').textContent = `$${subtotal.toFixed(2)}`;
+        }
+
 
     </script>
 </div>

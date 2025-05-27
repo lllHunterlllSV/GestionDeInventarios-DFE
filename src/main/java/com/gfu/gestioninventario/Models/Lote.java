@@ -60,6 +60,10 @@ public class Lote {
         this.costoUnitario = costoUnitario;
     }
 
+    public Lote(Integer loteId) {
+
+    }
+
     // Getters y Setters
     public Integer getLoteId() {
         return loteId;

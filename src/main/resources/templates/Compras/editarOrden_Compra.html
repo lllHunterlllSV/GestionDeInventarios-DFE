@@ -1,0 +1,383 @@
+<div th:fragment="modalEditarOrden">
+    <div id="modalEditarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300 ease-out"></div>
+
+    <div id="modalEditarOrden" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden opacity-0 scale-95 transition-all duration-300 ease-out" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative animate-fade-in-up">
+
+            <button type="button" onclick="cerrarModalEditar()" class="absolute top-4 right-4 text-gray-600 hover:text-red-600 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Editar Orden de Compra</h2>
+
+            <form id="formEditarOrden" method="post">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                        <input type="text" id="editarProveedorNombre" class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100" disabled>
+                        <input type="hidden" name="proveedorId" id="editarProveedorId">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Orden</label>
+                        <input type="date" name="fechaOrden" id="editarFechaOrden" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
+                        <select id="editarProductoId" class="w-full border border-gray-300 rounded px-2 py-2">
+                            <option value="" disabled selected hidden>Seleccione un producto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                        <input type="number" id="editarCantidad" min="1" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-gray-500 font-semibold">$</span>
+                            <input type="number" id="editarPrecio" step="0.01" min="0.01" class="w-full border border-gray-300 rounded pl-6 pr-2 py-2"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento</label>
+                        <input type="date" id="editarFechaVencimiento" class="w-full border border-gray-300 rounded px-2 py-2"/>
+                    </div>
+                    <div>
+                        <button type="button" onclick="agregarProductoEditar()" class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700 transition">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200 mb-4">
+                    <table class="w-full table-auto text-sm text-left text-gray-700" id="tablaEditarProductos">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 font-semibold">Producto</th>
+                            <th class="px-4 py-2 font-semibold">Cantidad</th>
+                            <th class="px-4 py-2 font-semibold">Precio Unitario</th>
+                            <th class="px-4 py-2 font-semibold">Fecha Vencimiento</th>
+                            <th class="px-4 py-2 font-semibold text-center">Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="text-right mt-2 mr-2">
+                    <span class="text-lg font-semibold text-gray-700">Subtotal: </span>
+                    <span id="editarSubtotalTexto" class="text-lg font-bold text-black-700">$0.00</span>
+                </div>
+
+                <input type="hidden" name="usuarioId" th:value="${usuarioId}"/>
+                <input type="hidden" name="tipoMovimientoId" value="1"/>
+                <div class="flex justify-end mt-6 space-x-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow">
+                        <i class="fas fa-save mr-2"></i> Guardar Cambios
+                    </button>
+
+                    <button type="button" onclick="confirmarRecepcion()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow">
+                        <i class="fas fa-check-circle mr-2"></i> Marcar como Recibido
+                    </button>
+
+                    <button type="button" onclick="confirmarCancelacion()" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded shadow">
+                        <i class="fas fa-times-circle mr-2"></i> Cancelar Orden
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalEditar() {
+            const modal = document.getElementById('modalEditarOrden');
+            const backdrop = document.getElementById('modalEditarBackdrop');
+            modal.classList.remove('hidden');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function cerrarModalEditar() {
+            const modal = document.getElementById('modalEditarOrden');
+            const backdrop = document.getElementById('modalEditarBackdrop');
+            modal.classList.add('opacity-0', 'scale-95');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+
+        function editarOrden(ordenId) {
+            fetch(`/compras/api/detalle/${ordenId}`)
+                .then(res => res.json())
+                .then(data => {
+                    abrirModalEditar();
+                    document.getElementById("formEditarOrden").action = `/compras/editar/${ordenId}`;
+
+                    document.getElementById("editarProveedorNombre").value = data.proveedor;
+                    document.getElementById("editarFechaOrden").value = data.fechaOrden?.split("T")[0] || '';
+                    document.getElementById("editarProveedorId").value = data.proveedorId || '';
+                    cargarProductosParaEditar(data.proveedorId);
+
+                    const tbody = document.querySelector("#tablaEditarProductos tbody");
+                    tbody.innerHTML = '';
+
+                    data.detalles.forEach((item, index) => {
+                        const precio = parseFloat(item.precioUnitario || 0);
+                        const cantidad = parseInt(item.cantidad || 0);
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+<td class='border px-4 py-1'>
+    ${item.producto}
+    <input type='hidden' name='detalles[${index}].producto.productoId' value='${item.productoId}'/>
+</td>
+<td class='border px-4 py-1'>
+    <div class="flex items-center gap-2">
+        <button type='button' class='bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded-full flex justify-center items-center'
+                onclick='ajustarCantidadDinamic(this, 1)'>
+            <i class="fas fa-plus text-xs"></i>
+        </button>
+        <span class='text-gray-800 font-semibold cantidadTexto'>${cantidad}</span>
+        <button type='button' class='bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded-full flex justify-center items-center'
+                onclick='ajustarCantidadDinamic(this, -1)'>
+            <i class="fas fa-minus text-xs"></i>
+        </button>
+        <input type='hidden' class='cantidadInput' name='detalles[${index}].cantidad' value='${cantidad}'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <div class="relative">
+        <span class="absolute left-2 top-1.5 text-gray-500 font-semibold">$</span>
+        <input type='number' name='detalles[${index}].precioUnitario' value='${precio}' step='0.01' min='0.01'
+               class='precioInput pl-6 border border-gray-300 rounded px-2 py-1 w-24'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <input type='date' class='border border-gray-300 rounded px-2 py-1 w-full'
+           name='detalles[${index}].fechaVencimiento' value='${item.fechaVencimiento || ''}' readonly/>
+</td>
+<td class='border px-4 py-1 text-center'>
+    <button type='button' onclick='this.closest("tr").remove(); actualizarSubtotalEditar();' class='text-red-600'>Eliminar</button>
+</td>`;
+                        tbody.appendChild(row);
+                    });
+
+                    actualizarSubtotalEditar();
+                });
+        }
+
+        function actualizarSubtotalEditar() {
+            let subtotal = 0.0;
+            const filas = document.querySelectorAll("#tablaEditarProductos tbody tr");
+
+            filas.forEach((fila) => {
+                const precioInput = fila.querySelector(".precioInput");
+                const cantidadInput = fila.querySelector(".cantidadInput");
+                if (precioInput && cantidadInput) {
+                    const precio = parseFloat(precioInput.value) || 0;
+                    const cantidad = parseInt(cantidadInput.value) || 0;
+                    subtotal += precio * cantidad;
+                }
+            });
+
+            document.getElementById('editarSubtotalTexto').textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        function ajustarCantidadDinamic(button, delta) {
+            const fila = button.closest("tr");
+            const input = fila.querySelector(".cantidadInput");
+            const span = fila.querySelector(".cantidadTexto");
+
+            let nuevaCantidad = parseInt(input.value) + delta;
+            if (nuevaCantidad < 1) nuevaCantidad = 1;
+
+            input.value = nuevaCantidad;
+            span.textContent = nuevaCantidad;
+
+            actualizarSubtotalEditar();
+        }
+
+        function agregarProductoEditar() {
+            const select = document.getElementById("editarProductoId");
+            const productoId = select.value;
+            const productoNombre = select.options[select.selectedIndex]?.text;
+            const cantidad = parseInt(document.getElementById("editarCantidad").value);
+            const precio = parseFloat(document.getElementById("editarPrecio").value);
+            const fechaVencimiento = document.getElementById("editarFechaVencimiento").value;
+
+            if (!productoId || !cantidad || !precio) {
+                Swal.fire({ icon: 'warning', text: 'Complete todos los campos para agregar el producto.' });
+                return;
+            }
+
+            const tabla = document.getElementById("tablaEditarProductos").querySelector("tbody");
+            const filas = tabla.querySelectorAll("tr");
+
+            for (let fila of filas) {
+                const idInput = fila.querySelector("input[name*='producto.productoId']");
+                if (idInput && idInput.value === productoId) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Producto ya agregado',
+                        text: 'Este producto ya está en la lista. Si desea cambiar la cantidad o el precio, edítelo directamente en la tabla.'
+                    });
+                    return;
+                }
+            }
+
+            const index = filas.length;
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+<td class='border px-4 py-1'>
+    ${productoNombre}
+    <input type='hidden' name='detalles[${index}].producto.productoId' value='${productoId}'/>
+</td>
+<td class='border px-4 py-1'>
+    <div class="flex items-center gap-2">
+        <button type='button' class='bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded-full flex justify-center items-center'
+                onclick='ajustarCantidadDinamic(this, 1)'>
+            <i class="fas fa-plus text-xs"></i>
+        </button>
+        <span class='text-gray-800 font-semibold cantidadTexto'>${cantidad}</span>
+        <button type='button' class='bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded-full flex justify-center items-center'
+                onclick='ajustarCantidadDinamic(this, -1)'>
+            <i class="fas fa-minus text-xs"></i>
+        </button>
+        <input type='hidden' class='cantidadInput' name='detalles[${index}].cantidad' value='${cantidad}'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <div class="relative">
+        <span class="absolute left-2 top-1.5 text-gray-500 font-semibold">$</span>
+        <input type='number' name='detalles[${index}].precioUnitario' value='${precio}' step='0.01' min='0.01'
+               class='precioInput pl-6 border border-gray-300 rounded px-2 py-1 w-24'/>
+    </div>
+</td>
+<td class='border px-4 py-1'>
+    <input type='date' class='border border-gray-300 rounded px-2 py-1 w-full'
+           name='detalles[${index}].fechaVencimiento' value='${fechaVencimiento}' readonly/>
+</td>
+<td class='border px-4 py-1 text-center'>
+    <button type='button' onclick='this.closest("tr").remove(); actualizarSubtotalEditar();' class='text-red-600'>Eliminar</button>
+</td>`;
+
+            tabla.appendChild(row);
+            actualizarSubtotalEditar();
+
+            document.getElementById("editarCantidad").value = "";
+            document.getElementById("editarPrecio").value = "";
+            document.getElementById("editarFechaVencimiento").value = "";
+        }
+
+        function cargarProductosParaEditar(proveedorId) {
+            const select = document.getElementById("editarProductoId");
+            fetch(`/compras/productos/proveedor/${proveedorId}`)
+                .then(res => res.json())
+                .then(productos => {
+                    select.innerHTML = '<option disabled selected hidden>Seleccione un producto</option>';
+                    productos.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.productoId;
+                        option.text = p.nombre;
+                        select.appendChild(option);
+                    });
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const formEditar = document.getElementById("formEditarOrden");
+
+            formEditar.addEventListener("submit", function (e) {
+                const filas = document.querySelectorAll("#tablaEditarProductos tbody tr");
+                if (filas.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin productos',
+                        text: 'Debe mantener al menos un producto en la orden para poder guardar los cambios.'
+                    });
+                }
+            });
+
+            document.addEventListener("input", function (e) {
+                if (e.target && (e.target.name.includes("precioUnitario") || e.target.name.includes("cantidad"))) {
+                    actualizarSubtotalEditar();
+                }
+            });
+        });
+
+
+
+        function confirmarRecepcion() {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: 'Al marcar como RECIBIDO ya no podrá editar esta orden.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, marcar como recibido',
+                cancelButtonText: 'Cancelar'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById("formEditarOrden");
+                    const ordenId = form.action.split("/").pop();
+                    const formData = new FormData(form);
+
+                    fetch(`/compras/recibir/${ordenId}`, {
+                        method: "POST",
+                        body: formData
+                    }).then(res => {
+                        if (res.ok) {
+                            location.href = "/compras/lista?exito=Orden recibida";
+                        } else {
+                            Swal.fire("Error", "No se pudo marcar como recibida", "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function confirmarCancelacion() {
+            Swal.fire({
+                title: '¿Cancelar esta orden?',
+                text: 'Se desactivarán todos sus lotes asociados.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById("formEditarOrden");
+                    const ordenId = form.action.split("/").pop();
+                    const formData = new FormData(form);
+
+                    fetch(`/compras/cancelar/${ordenId}`, {
+                        method: "POST",
+                        body: formData
+                    }).then(res => {
+                        if (res.ok) {
+                            location.href = "/compras/lista?exito=Orden cancelada";
+                        } else {
+                            Swal.fire("Error", "No se pudo cancelar la orden", "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
+
+    </script>
+
+</div>

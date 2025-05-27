@@ -1,17 +1,22 @@
 package com.gfu.gestioninventario.Services;
 
+import com.gfu.gestioninventario.DTOs.ProductoDTO;
 import com.gfu.gestioninventario.Models.Categoria;
 import com.gfu.gestioninventario.Models.Producto;
 import com.gfu.gestioninventario.Repository.ProductoRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService implements ProductoServiceInt{
@@ -126,9 +131,32 @@ public class ProductoService implements ProductoServiceInt{
     }
 
 
-    public List<Producto> findByProveedorId(Integer proveedorId) {
-        return productoRepository.findByProveedorProveedorId(proveedorId);
+    @PersistenceContext
+    private EntityManager entityManager1;
+
+    public List<ProductoDTO> obtenerProductosPorProveedor(Integer proveedorId) {
+        Query query = entityManager1.createNativeQuery("EXEC SP_ObtenerProductosPorProveedor :proveedorId");
+        query.setParameter("proveedorId", proveedorId);
+
+        List<Object[]> resultados = query.getResultList();
+
+        List<ProductoDTO> lista = new ArrayList<>();
+        for (Object[] fila : resultados) {
+            ProductoDTO dto = new ProductoDTO();
+            dto.setProductoId((Integer) fila[0]);
+            dto.setNombre((String) fila[1]);
+            dto.setDescripcion((String) fila[2]);
+            dto.setCategoria((String) fila[3]);
+            dto.setMedida((String) fila[4]);
+            dto.setProveedor((String) fila[5]);
+            lista.add(dto);
+        }
+
+        return lista;
     }
+
+
+
 
 
 

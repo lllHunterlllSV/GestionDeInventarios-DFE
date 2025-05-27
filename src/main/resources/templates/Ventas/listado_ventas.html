@@ -1,0 +1,522 @@
+    <!DOCTYPE html>
+    <html lang="es" class="scroll-smooth" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <title>Gestión de órdenes de compra - App de Gestión de Inventario</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+        </style>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Tom Select CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" />
+
+        <!-- FontAwesome para los íconos bonitos si no lo tenés ya -->
+
+
+        <!-- Tom Select JS (debe ir antes de usarlo) -->
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="flex flex-1 min-h-0">
+        <div th:insert="~{fragments/fragmentoSidebar :: sidebar}"></div>
+        <div class="flex flex-col flex-1 md:pl-64 min-h-screen">
+            <div th:insert="~{fragments/fragmentoNavbar :: navbar}"></div>
+
+            <section class="mb-12 px-4" id="gestion-ventas">
+                <div class="mt-10 text-center mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-800">Gestión de ventas</h3>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 mt-10 mx-auto w-full max-w-8xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                        <form id="filtroForm" th:action="@{/ventas/lista}" method="get" class="flex flex-col sm:flex-row gap-2 sm:items-center w-full">
+                            <div class="relative w-full sm:w-1/2">
+                                <input type="search" name="keyword" placeholder="Buscar por ID, Cliente o Estado.."
+                                       class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-green-500 text-gray-700"
+                                       th:value="${keyword}"/>
+                                <span class="absolute left-3 top-2.5 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+
+                            <select name="sortField" class="border rounded-md px-3 py-2" onchange="enviarFormulario()">
+                                <option value="ventaId" th:selected="${sortField == 'ventaId'}">Ordenar por ID</option>
+                                <option value="fechaVenta" th:selected="${sortField == 'fechaVenta'}">Ordenar por Fecha</option>
+                                <option value="estado" th:selected="${sortField == 'estado'}">Ordenar por Estado</option>
+                            </select>
+
+                            <select name="sortDir" class="border rounded-md px-3 py-2" onchange="enviarFormulario()">
+                                <option value="asc">Ascendente</option>
+                                <option value="desc">Descendente</option>
+                            </select>
+
+                            <input type="hidden" name="size" th:value="${size}"/>
+
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow">
+                                <i class="fas fa-search mr-2"></i>Buscar
+                            </button>
+
+                            <button type="button" onclick="resetBusqueda()"
+                                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg shadow">
+                                <i class="fas fa-undo mr-2"></i>Limpiar
+                            </button>
+                        </form>
+
+                        <button type="button"
+                                onclick="abrirModalVenta()"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+                            <i class="fas fa-plus mr-2"></i> Nueva venta
+                        </button>
+                    </div>
+
+                    <div class="mb-4 text-sm text-gray-600">
+                        Mostrando
+                        <span th:text="${ventas.totalElements == 0 ? 0 : (paginaActual * size) + 1}">1</span> a
+                        <span th:text="${(ventas.number * ventas.size) + ventas.numberOfElements}">5</span> de
+                        <span th:text="${ventas.totalElements}">total</span> ventas
+                    </div>
+
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-blue-700">ID</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-blue-700">Cliente</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-blue-700">Fecha</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-blue-700">Estado</th>
+                            <th class="px-4 py-2 text-center text-sm font-semibold text-blue-700">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100" th:if="${ventas.totalElements == 0}">
+                        <tr>
+                            <td colspan="5" class="px-4 py-6 text-center text-gray-500 text-sm">
+                                No se encontraron ventas <span th:if="${keyword}" th:text="'con el término: ' + ${keyword}"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tbody class="divide-y divide-gray-100" th:unless="${ventas.totalElements == 0}">
+                        <tr th:each="venta : ${ventas.content}" class="hover:bg-blue-50">
+                            <td class="px-4 py-2 text-sm text-gray-700" th:text="${venta.ventaId}"></td>
+                            <td class="px-4 py-2 text-sm text-gray-700" th:text="${venta.cliente?.nombreCliente} ?: 'Sin cliente'"></td>
+                            <td class="px-4 py-2 text-sm text-gray-700" th:text="${#dates.format(venta.fechaVenta, 'yyyy-MM-dd')}"></td>
+                            <td class="px-4 py-2 text-sm">
+                                <span th:classappend="
+                                    ${#strings.equalsIgnoreCase(venta.estado, 'PENDIENTE')} ? 'bg-yellow-100 text-yellow-800' :
+                                    (${#strings.equalsIgnoreCase(venta.estado, 'COMPLETADO')} ? 'bg-green-100 text-green-800' :
+                                    (${#strings.equalsIgnoreCase(venta.estado, 'ANULADO')} ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'))"
+                                      class="px-2 py-1 rounded-full font-semibold text-xs uppercase tracking-wide"
+                                      th:text="${venta.estado}">
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="flex justify-center gap-3">
+                                    <!-- Ver Detalles -->
+                                    <button type="button"
+                                            th:onclick="'verDetalleVenta(' + ${venta.ventaId} + ')'"
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm font-medium shadow transition">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Detalles</span>
+                                    </button>
+
+                                    <!-- Botón Editar -->
+
+
+                                    <!-- Botón Eliminar -->
+                                    <button type="button"
+                                            th:onclick="'confirmarEliminarVenta(' + ${venta.ventaId} + ')'"
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500 text-white hover:bg-red-600 rounded-xl text-sm font-medium shadow transition">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Eliminar</span>
+                                    </button>
+
+                                    <!-- Ver Factura -->
+                                    <a th:href="@{'/ventas/factura/' + ${venta.ventaId}}"
+                                       target="_blank"
+                                       class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 rounded-xl text-sm font-medium shadow transition">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Factura</span>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-between items-center mt-6">
+                        <div>
+                            <span class="text-sm text-gray-700">Mostrar:</span>
+                            <select class="border rounded px-2 py-1 text-sm" onchange="location = this.value;">
+                                <option th:each="s : ${sizeOptions}" th:value="@{/ventas/lista(size=${s}, page=0, keyword=${keyword})}" th:text="${s}" th:selected="${ventas.size == s}"></option>
+                            </select>
+                        </div>
+
+                        <nav aria-label="Paginación">
+                            <ul class="inline-flex items-center -space-x-px">
+                                <li>
+                                    <a th:href="@{/ventas/lista(page=${ventas.number - 1}, size=${ventas.size}, keyword=${keyword})}"
+                                       class="px-3 py-2 ml-0 border rounded-l-lg bg-white hover:bg-blue-50"
+                                       th:classappend="${ventas.first} ? 'pointer-events-none opacity-50' : ''">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li th:each="i : ${#numbers.sequence(1, ventas.totalPages)}">
+                                    <a th:href="@{/ventas/lista(page=${i - 1}, size=${ventas.size}, keyword=${keyword})}"
+                                       th:text="${i}"
+                                       class="px-3 py-2 border"
+                                       th:class="${(i - 1) == ventas.number} ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 hover:bg-blue-50'">
+                                    </a>
+                                </li>
+                                <li>
+                                    <a th:href="@{/ventas/lista(page=${ventas.number + 1}, size=${ventas.size}, keyword=${keyword})}"
+                                       class="px-3 py-2 border rounded-r-lg bg-white hover:bg-blue-50"
+                                       th:classappend="${ventas.last} ? 'pointer-events-none opacity-50' : ''">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </section>
+            <div th:replace="ventas/createVenta :: modalNuevaVenta"></div>
+
+            <div th:replace="ventas/ver_detalle_venta :: modalDetalleVenta"></div>
+
+
+        </div>
+    </div>
+
+
+
+    <script th:inline="javascript">
+        const exito = /*[[${param.exito}]]*/ null;
+        const error = /*[[${param.error}]]*/ null;
+
+        if (exito) {
+            Swal.fire({ icon: 'success', title: 'Éxito', text: exito });
+        }
+        if (error) {
+            Swal.fire({ icon: 'error', title: 'Error', text: error });
+        }
+    </script>
+
+    <script>
+        let productosDisponibles = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const fechaInput = document.getElementById("fechaVenta");
+            fechaInput.value = new Date().toISOString().split('T')[0];
+
+            // Cargar productos
+            fetch("/ventas/api/productos")
+                .then(res => res.json())
+                .then(data => {
+                    productosDisponibles = data;
+                    const datalist = document.getElementById("listaProductos");
+                    productosDisponibles.forEach(p => {
+                        const option = document.createElement("option");
+                        option.value = p.nombre;
+                        option.setAttribute("data-id", p.productoId);
+                        datalist.appendChild(option);
+                    });
+                });
+
+            // Cargar clientes
+            fetch("/ventas/api/clientes")
+                .then(res => res.json())
+                .then(clientes => {
+                    const select = document.getElementById("clienteId");
+                    clientes.forEach(c => {
+                        const option = document.createElement("option");
+                        option.value = c.clienteId;
+                        option.text = c.nombreCliente;
+                        select.appendChild(option);
+                    });
+                });
+
+            // Buscar lotes del producto seleccionado
+            document.getElementById("busquedaProducto").addEventListener("change", () => {
+                const nombre = document.getElementById("busquedaProducto").value;
+                const producto = productosDisponibles.find(p => p.nombre === nombre);
+                const selectLote = document.getElementById("loteSeleccionado");
+                selectLote.innerHTML = "<option disabled>Seleccione un lote</option>";
+
+                if (producto) {
+                    fetch(`/ventas/api/lotes-disponibles/${producto.productoId}`)
+                        .then(res => res.json())
+                        .then(lotes => {
+                            lotes = lotes.filter(l => l.cantidadDisponible > 0);
+                            lotes.sort((a, b) => {
+                                const fechaA = a.fechaVencimiento ? new Date(a.fechaVencimiento) : new Date(a.fechaIngreso);
+                                const fechaB = b.fechaVencimiento ? new Date(b.fechaVencimiento) : new Date(b.fechaIngreso);
+                                return fechaA - fechaB;
+                            });
+
+                            lotes.forEach((lote, index) => {
+                                const option = document.createElement("option");
+                                option.value = lote.loteId;
+                                option.text = `Lote ${lote.loteId} - ${lote.cantidadDisponible} disponibles${lote.fechaVencimiento ? ' - vence ' + lote.fechaVencimiento.split('T')[0] : ''}`;
+                                option.setAttribute("data-precio", lote.precioVenta);
+                                option.setAttribute("data-cantidad", lote.cantidadDisponible);
+                                if (index === 0) option.selected = true;
+                                selectLote.appendChild(option);
+                            });
+                        });
+                }
+            });
+        });
+
+        function abrirModalVenta() {
+            const modal = document.getElementById('modalNuevaVenta');
+            const backdrop = document.getElementById('modalBackdropVenta');
+            modal.classList.remove('hidden');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function cerrarModalVenta() {
+            const modal = document.getElementById('modalNuevaVenta');
+            const backdrop = document.getElementById('modalBackdropVenta');
+            modal.classList.remove('opacity-100', 'scale-100');
+            modal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+
+        function agregarProductoVentaManual() {
+            const nombre = document.getElementById("busquedaProducto").value;
+            const producto = productosDisponibles.find(p => p.nombre === nombre);
+            const lote = document.getElementById("loteSeleccionado");
+            const loteId = lote.value;
+            const loteTexto = lote.options[lote.selectedIndex].text;
+            const cantidad = parseInt(document.getElementById("cantidadVenta").value);
+            const precioUnitario = parseFloat(lote.options[lote.selectedIndex].getAttribute("data-precio"));
+            const cantidadDisponible = parseInt(lote.options[lote.selectedIndex].getAttribute("data-cantidad"));
+
+            if (!producto || !loteId || isNaN(cantidad) || cantidad <= 0 || cantidad > cantidadDisponible) {
+                Swal.fire({ icon: 'warning', title: 'Datos inválidos', text: 'Verifica los datos del producto, lote o cantidad.' });
+                return;
+            }
+
+            const tabla = document.querySelector("#tablaProductosVenta tbody");
+            const filas = tabla.querySelectorAll("tr");
+
+            for (let fila of filas) {
+                const idProducto = fila.querySelector("input[name*='.productoId']").value;
+                const idLote = fila.querySelector("input[name*='.loteId']").value;
+                if (idProducto === String(producto.productoId) && idLote === String(loteId)) {
+                    Swal.fire({ icon: 'info', title: 'Ya agregado', text: 'Este producto con ese lote ya está en la tabla.' });
+                    return;
+                }
+            }
+
+            const index = filas.length;
+            const fila = `
+        <tr>
+          <td>
+            <input type="hidden" name="detalles[${index}].productoId" value="${producto.productoId}"/>
+            ${producto.nombre}
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="ajustarCantidad(${index}, 1)" class="bg-green-500 text-white w-7 h-7 rounded-full flex justify-center items-center">
+                  <i class="fas fa-plus text-xs"></i>
+              </button>
+              <span id="cantidadTexto-${index}" class="text-gray-800 font-semibold">${cantidad}</span>
+              <button type="button" onclick="ajustarCantidad(${index}, -1)" class="bg-red-500 text-white w-7 h-7 rounded-full flex justify-center items-center">
+                  <i class="fas fa-minus text-xs"></i>
+              </button>
+              <input type="hidden" id="cantidadInput-${index}" name="detalles[${index}].cantidad" value="${cantidad}"/>
+            </div>
+          </td>
+          <td>
+            <input type="hidden" name="detalles[${index}].precioUnitario" value="${precioUnitario}"/>
+            $${precioUnitario.toFixed(2)}
+          </td>
+          <td>
+            <input type="hidden" name="detalles[${index}].loteId" value="${loteId}" data-disponibles="${cantidadDisponible}"/>
+            ${loteTexto}
+          </td>
+          <td class="text-center">
+            <button type="button" onclick="this.closest('tr').remove(); actualizarSubtotal();" class="text-red-600 hover:text-red-800">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>`;
+
+            tabla.insertAdjacentHTML("beforeend", fila);
+            actualizarSubtotal();
+            document.getElementById("cantidadVenta").value = "";
+        }
+
+        function ajustarCantidad(index, delta) {
+            const input = document.getElementById(`cantidadInput-${index}`);
+            const span = document.getElementById(`cantidadTexto-${index}`);
+            const loteInput = document.querySelector(`input[name="detalles[${index}].loteId"]`);
+            const maxCantidad = parseInt(loteInput.getAttribute("data-disponibles")) || Infinity;
+
+            let cantidad = parseInt(input.value) + delta;
+            if (cantidad < 1 || cantidad > maxCantidad) return;
+
+            input.value = cantidad;
+            span.textContent = cantidad;
+
+            actualizarSubtotal();
+        }
+
+        function actualizarSubtotal() {
+            let subtotal = 0;
+            document.querySelectorAll("#tablaProductosVenta tbody tr").forEach(row => {
+                const precio = parseFloat(row.cells[2].textContent.replace('$', '')) || 0;
+                const cantidad = parseInt(row.querySelector("input[name*='cantidad']").value) || 0;
+                subtotal += precio * cantidad;
+            });
+            document.getElementById("subtotalTextoVenta").textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        function abrirModalEditarVenta() {
+            const modal = document.getElementById('modalEditarVenta');
+            const backdrop = document.getElementById('modalEditarBackdrop');
+            modal.classList.remove('hidden');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function cerrarModalEditarVenta() {
+            const modal = document.getElementById('modalEditarVenta');
+            const backdrop = document.getElementById('modalEditarBackdrop');
+            modal.classList.remove('opacity-100', 'scale-100');
+            modal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+
+
+
+
+        function confirmarEliminarVenta(ventaId) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Esta acción eliminará la venta permanentemente.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/ventas/eliminar/${ventaId}`, {
+                        method: 'GET'
+                    })
+                        .then(res => {
+                            if (res.ok) {
+                                Swal.fire('Eliminado', 'La venta ha sido eliminada.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Error', 'No se pudo eliminar la venta.', 'error');
+                            }
+                        });
+                }
+            });
+        }
+
+
+        function editarVenta(ventaId) {
+            fetch(`/ventas/api/detalle/${ventaId}`)
+                .then(res => res.json())
+                .then(data => {
+                    abrirModalEditarVenta();
+                    document.getElementById("formEditarVenta").action = `/ventas/editar/${ventaId}`;
+                    document.getElementById("editarClienteNombre").value = data.cliente;
+                    document.getElementById("editarClienteId").value = data.clienteId;
+                    document.getElementById("editarFechaVenta").value = data.fechaVenta?.split("T")[0] || "";
+
+                    const tbody = document.querySelector("#tablaEditarProductosVenta tbody");
+                    tbody.innerHTML = "";
+
+                    data.detalles.forEach((item, index) => {
+                        const fila = `
+                <tr>
+                    <td>${item.producto}<input type="hidden" name="detalles[${index}].productoId" value="${item.producto_id}"/></td>
+                    <td><input type="number" name="detalles[${index}].cantidad" value="${item.cantidad}" min="1" class="border px-2 py-1 rounded w-16"/></td>
+                    <td>$${parseFloat(item.precio_unitario).toFixed(2)}<input type="hidden" name="detalles[${index}].precioUnitario" value="${item.precio_unitario}"/></td>
+                    <td>
+                        <select name="detalles[${index}].loteId" class="border px-2 py-1 rounded">
+                            <option value="${item.lote_id}" selected>Lote ${item.lote_id}</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="text-red-600" onclick="this.closest('tr').remove();">Eliminar</button>
+                    </td>
+                </tr>`;
+                        tbody.insertAdjacentHTML("beforeend", fila);
+                    });
+                });
+        }
+
+        function abrirModalEditarVenta() {
+            const modal = document.getElementById('modalEditarVenta');
+            const backdrop = document.getElementById('modalEditarBackdrop');
+            modal.classList.remove('hidden');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+
+
+
+        function cargarLotesParaEdicion() {
+            document.querySelectorAll("#tablaEditarProductosVenta select[name$='.loteId']").forEach(select => {
+                const productoId = select.closest("tr").querySelector("input[name$='.productoId']").value;
+                const loteSeleccionado = select.value;
+
+                fetch(`/ventas/api/lotes-disponibles/${productoId}`)
+                    .then(res => res.json())
+                    .then(lotes => {
+                        select.innerHTML = ""; // Limpiar opciones
+                        lotes = lotes.filter(l => l.cantidadDisponible > 0);
+                        lotes.sort((a, b) => {
+                            const fechaA = a.fechaVencimiento ? new Date(a.fechaVencimiento) : new Date(a.fechaIngreso);
+                            const fechaB = b.fechaVencimiento ? new Date(b.fechaVencimiento) : new Date(b.fechaIngreso);
+                            return fechaA - fechaB;
+                        });
+
+                        lotes.forEach(lote => {
+                            const opt = document.createElement("option");
+                            opt.value = lote.loteId;
+                            opt.text = `Lote ${lote.loteId} - ${lote.cantidadDisponible} disponibles${lote.fechaVencimiento ? ' - vence ' + lote.fechaVencimiento.split("T")[0] : ''}`;
+                            opt.setAttribute("data-precio", lote.precioVenta);
+                            opt.setAttribute("data-cantidad", lote.cantidadDisponible);
+                            if (String(lote.loteId) === String(loteSeleccionado)) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+                    });
+            });
+        }
+
+    </script>
+
+
+    </body>
+    </html>

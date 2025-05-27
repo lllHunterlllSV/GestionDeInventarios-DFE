@@ -1,5 +1,6 @@
 package com.gfu.gestioninventario.Models;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,10 @@ public class Producto {
 
     @Column(name = "descripcion")
     private String descripcion;
+
+    @Column(name = "precio_venta")
+    private BigDecimal precioVenta;
+
 
     ///relacion categoria
     @ManyToOne
@@ -61,6 +66,10 @@ public class Producto {
         this.categoria = categoria;
         this.medidas = medidas;
         this.proveedores = proveedores;
+    }
+
+    public Producto(Integer productoId) {
+
     }
 
 
@@ -139,5 +148,11 @@ public class Producto {
     }
 
 
-    
+    public BigDecimal getPrecioVenta() {
+        return precioVenta;
+    }
+
+    public void setPrecioVenta(BigDecimal precioVenta) {
+        this.precioVenta = precioVenta;
+    }
 }

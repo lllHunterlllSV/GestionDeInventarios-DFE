@@ -76,6 +76,9 @@ public class Usuarios {
         this.usuario = usuario;
     }
 
+            public Usuarios(Integer usuarioId) {
+    }
+
     // --- Getters y Setters ---
 
     public String getEmail() {

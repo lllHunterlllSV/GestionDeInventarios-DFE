@@ -119,6 +119,8 @@
             <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Categoría</th>
             <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Proveedor</th>
             <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Medida</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Precio de venta</th>
+            <th class="px-4 py-2 text-left text-sm font-semibold text-green-700">Acciones</th>
 
           </tr>
           </thead>
@@ -141,6 +143,7 @@
             <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.categoria.nombre}"></td>
             <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.proveedores.nombreProveedor}"></td>
             <td class="px-4 py-2 text-sm text-gray-700" th:text="${producto.medidas.medida}"></td>
+            <td class="px-4 py-2 text-sm text-gray-700" th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 'COMMA', 2, 'POINT')}"></td>
             <td class="px-4 py-2 text-center space-x-2">
               <a th:href="@{/productos/editar/{id}(id=${producto.productoId})}"
                  class="text-green-600 hover:text-green-800 focus:outline-none">

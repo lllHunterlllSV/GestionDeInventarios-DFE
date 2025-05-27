@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
+    List<Cliente> findByEstadoTrue(); // ← este método recupera solo clientes activos
+
     // Buscar por NIF o DUI
     Optional<Cliente> findByNIF(String nif);
     Optional<Cliente> findByDUI(String dui);
