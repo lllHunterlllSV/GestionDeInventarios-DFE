@@ -68,6 +68,10 @@ public class Producto {
         this.proveedores = proveedores;
     }
 
+    public Producto(Integer productoId) {
+
+    }
+
 
     //GETTERS
     public Integer getProductoId() {

@@ -31,4 +31,5 @@ public interface LoteRepository extends JpaRepository<Lote, Integer> {
     );
 
 
+
 }

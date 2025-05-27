@@ -102,4 +102,12 @@ public class DetalleVenta {
     public void setDevoluciones(List<Devolucion> devoluciones) {
         this.devoluciones = devoluciones;
     }
+
+    public Lote getLote() {
+        return lote;
+    }
+
+    public void setLote(Lote lote) {
+        this.lote = lote;
+    }
 }

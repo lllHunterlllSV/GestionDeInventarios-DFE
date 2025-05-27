@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -233,6 +234,62 @@ public class VentaController {
             }
         }
     }
+
+
+    @GetMapping("/eliminar/{ventaId}")
+    public String eliminarVenta(@PathVariable Integer ventaId) {
+        try {
+
+
+
+
+            ventaService.eliminarVentaCompleta(ventaId);
+            return "redirect:/ventas/lista?exito=Venta eliminada correctamente";
+
+        } catch (Exception e) {
+            return "redirect:/ventas/lista?error=" + e.getMessage();
+        }
+    }
+
+
+        @GetMapping("/api/detalle/{ventaId}")
+        @ResponseBody
+        public ResponseEntity<?> obtenerDetalleVenta(@PathVariable Integer ventaId) {
+            Venta venta = ventaService.buscarPorId(ventaId);
+            if (venta == null) return ResponseEntity.notFound().build();
+
+            List<Map<String, Object>> detalles = ventaService.obtenerDetalleParaEdicion(ventaId);
+            Map<String, Object> response = Map.of(
+                    "ventaId", venta.getVentaId(),
+                    "clienteId", venta.getCliente().getClienteId(),
+                    "cliente", venta.getCliente().getNombreCliente(),
+                    "fechaVenta", venta.getFechaVenta(),
+                    "notas", venta.getNotas(),
+                    "detalles", detalles
+            );
+            return ResponseEntity.ok(response);
+        }
+
+        /*
+    @PostMapping("/editar/{ventaId}")
+    public String editarVenta(@PathVariable Integer ventaId,
+                              @ModelAttribute VentaCompletaDTO dto) {
+        try {
+            ventaService.editarVentaCompleta(
+                    ventaId,
+                    dto.getFechaVenta(),
+                    dto.getDetalles(),
+                    dto.getUsuarioId(),
+                    dto.getTipoMovimientoId()
+            );
+            return "redirect:/ventas/lista?exito=Venta editada correctamente";
+        } catch (Exception e) {
+            return "redirect:/ventas/lista?error=" + e.getMessage();
+        }
+    }
+*/
+
+
 
 
 
