@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8"/>
@@ -16,17 +17,41 @@
       Panel de Control
     </h2>
     <div class="flex items-center space-x-4">
-      <button aria-label="Notificaciones" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+      <a th:if="${not #lists.isEmpty(productos)}"
+         th:href="@{/alerta/stock-bajo}"
+         class="hidden md:flex items-center bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md hover:bg-red-600 transition duration-200 ease-in-out transform hover:scale-105 animate-pulse-once">
+        <i class="fas fa-exclamation-triangle mr-2"></i> Low Stock
+      </a>
+
+      <a aria-label="Notificaciones"
+         class="relative text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+         th:href="@{/alerta/stock-bajo}">
         <i class="fas fa-bell fa-lg"></i>
-      </button>
-      <button aria-label="Perfil de usuario" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+        <span th:if="${not #lists.isEmpty(productos)}"
+              class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center animate-pulse shadow">
+    <i class="fas fa-exclamation"></i>
+  </span>
+      </a>
+
+      <a aria-label="Perfil de usuario" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"  th:href="@{/usuario/perfil}">
         <img alt="Avatar circular de usuario con fondo gris y letra U blanca" class="w-8 h-8 rounded-full object-cover" height="32" src="https://storage.googleapis.com/a1aa/image/1adf693d-5d83-413c-ed63-4535c3a44024.jpg" width="32"/>
-        <span class="hidden sm:block text-gray-700 font-medium">
-                        Usuario
+        <span class="hidden sm:block text-gray-700 font-medium"
+              th:text="${nombreUsuario}">
                     </span>
-      </button>
+      </a>
     </div>
   </header>
 </div>
+
+<style>
+  @keyframes pulse-once {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-pulse-once {
+    animation: pulse-once 1.5s ease-out 1; /* Runs once */
+  }
+</style>
 </body>
 </html>

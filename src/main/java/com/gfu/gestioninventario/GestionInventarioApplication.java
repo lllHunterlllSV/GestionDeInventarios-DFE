@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class
 GestionInventarioApplication {
-    /*
+/*
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -39,13 +39,13 @@ GestionInventarioApplication {
         usuario.setRoles(role);
         usuariosRepository.save(usuario);
 
-    }*/
+    }
+*/
 
     public static void main(String[] args) {
         SpringApplication.run(GestionInventarioApplication.class, args);
 
 
     }
-
 
 }

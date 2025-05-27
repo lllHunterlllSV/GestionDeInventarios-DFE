@@ -3,7 +3,13 @@ package com.gfu.gestioninventario.Services;
 import com.gfu.gestioninventario.Models.*;
 import com.gfu.gestioninventario.Repository.*;
 import jakarta.transaction.Transactional;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class LoteService {
@@ -206,5 +213,10 @@ public class LoteService {
     public List<Lote> listarPorOrden(Integer ordenId) {
         return loteRepository.findByOrdenOrdenId(ordenId);
     }
+
+
+
+
+
 
 }

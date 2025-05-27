@@ -1,4 +1,4 @@
-/*
+
 package com.gfu.gestioninventario.security;
 
 import com.gfu.gestioninventario.Models.Usuarios;
@@ -53,5 +53,8 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled(){
         return true;
     }
+
+    public Usuarios getUsuario() {
+        return usuario;
+    }
 }
-*/

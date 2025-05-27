@@ -13,7 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface LoteRepository extends JpaRepository<Lote, Integer> {
+
     List<Lote> findByOrdenOrdenId(Integer ordenId);
+
     Optional<Lote> findByOrdenOrdenIdAndProductoProductoId(Integer ordenId, Integer productoId);
 
     @Modifying
@@ -29,7 +31,4 @@ public interface LoteRepository extends JpaRepository<Lote, Integer> {
             int cantidad,
             EstadoOrden estado
     );
-
-
-
 }

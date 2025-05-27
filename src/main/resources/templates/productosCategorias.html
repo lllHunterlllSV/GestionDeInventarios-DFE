@@ -47,7 +47,14 @@
       <button aria-label="Buscar categorías" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-r-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" id="searchBtn" title="Buscar" type="submit">
         BUSCAR
       </button>
+      <button type="button"
+              onclick="resetBusqueda()"
+              class="inline-flex items-center px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg shadow focus:ring-gray-400">
+        <i class="fas fa-undo mr-2"></i> Limpiar
+      </button>
+
     </div>
+
 
     <div class="flex items-center space-x-4 whitespace-nowrap">
       <label class="text-gray-700 font-medium text-sm" for="sortSelect">
@@ -78,6 +85,7 @@
         <i class="fas fa-list fa-lg">
         </i>
       </button>
+
     </div>
   </form>
         <div class="mb-4 flex justify-end space-x-2">
@@ -205,6 +213,10 @@
     // Configurar eventos de clic iniciales
     setupCategoryClickEvents();
   });
+  function resetBusqueda() {
+    window.location.href = '/productos/categorias';
+  }
+
 
   document.getElementById('sortSelect').addEventListener('change', function () {
     const selected = this.value;
