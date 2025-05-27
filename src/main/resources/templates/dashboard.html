@@ -97,11 +97,13 @@
                     </div>
                 </div>
                 </div>
+
         </section>
     </div>
 </div>
 
-<script src="/js/sweetAlert.js"></script>
+
+
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
         const exito = document.body.getAttribute('data-exito');
@@ -234,5 +236,26 @@
 
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:inline="javascript" th:if="${not #lists.isEmpty(productos)} and (${#authorization.expression('hasRole(''ADMIN'') or hasRole(''MANAGER'')')})">
+    if (!sessionStorage.getItem('stockBajoAlertShown')) {
+        Swal.fire({
+            title: '¡Alerta de Stock Bajo!',
+            text: 'Tienes productos con stock bajo. Ve a la sección de alertas para revisarlos.',
+            icon: 'warning',
+            confirmButtonText: 'Ver productos',
+            showCancelButton: true,
+            cancelButtonText: 'Cerrar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = /*[[ @{/alerta/stock-bajo} ]]*/ '/alerta/stock-bajo';
+            }
+        });
+        // Marcamos que la alerta ya se mostró
+        sessionStorage.setItem('stockBajoAlertShown', 'true');
+    }
+</script>
+
 </body>
 </html>
