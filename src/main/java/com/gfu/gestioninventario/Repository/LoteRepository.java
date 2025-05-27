@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface LoteRepository extends JpaRepository<Lote, Integer> {
     List<Lote> findByOrdenOrdenId(Integer ordenId);
     Optional<Lote> findByOrdenOrdenIdAndProductoProductoId(Integer ordenId, Integer productoId);
+
+
+
 }

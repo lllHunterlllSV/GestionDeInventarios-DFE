@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo}">Stock Bajo</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 antialiased">
+<div class="container mx-auto mt-8 p-4">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-4xl font-extrabold text-indigo-700" th:text="${titulo}">Productos con Stock Bajo</h1>
+    <a th:href="@{/dashboard}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out flex items-center transform hover:scale-105">
+      <i class="fas fa-arrow-left mr-2"></i> Volver al Dashboard
+    </a>
+  </div>
+
+  <div th:if="${#lists.isEmpty(productos)}" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-5 rounded-lg shadow-md" role="alert">
+    <div class="flex items-center">
+      <div class="py-1"><i class="fas fa-check-circle text-2xl mr-3"></i></div>
+      <div>
+        <p class="font-bold text-lg">¡Todo en orden!</p>
+        <p class="text-base">No hay productos con stock bajo actualmente.</p>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${not #lists.isEmpty(productos)}" class="bg-red-50 border-l-4 border-red-500 text-red-800 p-6 my-6 rounded-lg shadow-xl">
+    <p class="font-bold text-xl mb-4">Productos con stock bajo:</p>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
+        <thead class="bg-red-100">
+        <tr>
+          <th class="py-3 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">ID</th>
+          <th class="py-3 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Producto</th>
+          <th class="py-3 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Stock Total</th>
+          <th class="py-3 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Categoría</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+        <tr th:each="prod : ${productos}" class="hover:bg-red-50 transition duration-200 ease-in-out">
+          <td class="py-3 px-6 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${prod.productoId}"></td>
+          <td class="py-3 px-6 whitespace-nowrap text-sm text-gray-700" th:text="${prod.producto}"></td>
+          <td class="py-3 px-6 whitespace-nowrap text-sm text-gray-700" th:text="${prod.stockTotal}"></td>
+          <td class="py-3 px-6 whitespace-nowrap text-sm text-gray-700" th:text="${prod.categoria}"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

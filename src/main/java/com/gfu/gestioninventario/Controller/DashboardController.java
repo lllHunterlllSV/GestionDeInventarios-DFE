@@ -1,6 +1,8 @@
 package com.gfu.gestioninventario.Controller;
 
+import com.gfu.gestioninventario.DTOs.AlertaStockDTO;
 import com.gfu.gestioninventario.Repository.*;
+import com.gfu.gestioninventario.Services.AlertaStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,8 @@ public class DashboardController {
     // @Autowired
     // private final VentaRepository ventaRepository;
     private final OrdenCompraRepository ordenCompraRepository;
+    @Autowired
+    private AlertaStockService alertaStockService;
 
     @Autowired
     public DashboardController(
@@ -47,6 +51,7 @@ public class DashboardController {
         long totalOrdenesCompra = ordenCompraRepository.count();
 
         List<Object[]> productosPorCategoria = productoRepository.countProductsByCategory();
+        List<AlertaStockDTO> productos = alertaStockService.obtenerProductosConStockBajo();
 
         model.addAttribute("totalProductos", totalProductos);
         model.addAttribute("totalLotes", totalLotes);
@@ -55,8 +60,11 @@ public class DashboardController {
         model.addAttribute("totalVentas", totalVentas);
         model.addAttribute("totalOrdenesCompra", totalOrdenesCompra);
         model.addAttribute("productosPorCategoria", productosPorCategoria);
+        model.addAttribute("productos", productos);
         model.addAttribute("title", "Dashboard");
 
         return "dashboard";
     }
+
+
 }

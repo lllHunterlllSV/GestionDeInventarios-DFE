@@ -1,3 +1,5 @@
+
+<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,55 +38,91 @@
                 </div>
 
                 <!-- Card Body -->
-                <form id="userForm" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <form id="userForm" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6" th:action="@{/usuario/editar}" th:object="${usuario}" method="post">
+
+                    <!-- Usuario field - always readonly -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="usuario">
                             Usuario
                         </label>
                         <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
-                               id="usuario" name="usuario" readonly="" type="text" th:field="*{usuario.usuario}"/>
+                               id="usuario" name="usuario" readonly type="text" th:field="*{usuario}" required/>
                     </div>
+
+                    <!-- Password field - editable -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="contraseña">
                             Contraseña
                         </label>
                         <div class="relative">
                             <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
-                                   id="contraseña" name="contraseña" readonly="" type="password" th:field="*{usuario.contrasena}"/>
+                                   id="contraseña" name="contraseña" readonly type="password" th:field="*{contrasena}"
+                                   minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"/>
                             <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800">
                                 <i class="far fa-eye"></i>
                             </button>
                         </div>
+                        <div id="passwordRequirements" class="text-sm text-gray-600 mt-1 hidden">
+                            <p id="lengthRequirement" class="flex items-center"><span class="inline-block w-4 h-4 mr-1">•</span> Mínimo 8 caracteres</p>
+                            <p id="uppercaseRequirement" class="flex items-center"><span class="inline-block w-4 h-4 mr-1">•</span> Al menos 1 mayúscula</p>
+                            <p id="lowercaseRequirement" class="flex items-center"><span class="inline-block w-4 h-4 mr-1">•</span> Al menos 1 minúscula</p>
+                            <p id="numberRequirement" class="flex items-center"><span class="inline-block w-4 h-4 mr-1">•</span> Al menos 1 número</p>
+                        </div>
+                        <p id="passwordError" class="text-red-500 text-sm hidden">La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números</p>
                     </div>
+
+                    <!-- Confirm password - only shown in edit mode -->
+                    <div id="confirmPasswordContainer" class="hidden">
+                        <label class="block text-gray-700 font-medium mb-1" for="confirmarContraseña">
+                            Confirmar Contraseña
+                        </label>
+                        <div class="relative">
+                            <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-500"
+                                   id="confirmarContraseña" name="confirmarContraseña" type="password"
+                                   minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"/>
+                            <button type="button" id="toggleConfirmPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <p id="passwordMatchError" class="text-red-500 text-sm hidden">Las contraseñas no coinciden</p>
+                    </div>
+
+                    <!-- Estado - always readonly -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="estado">
                             Estado
                         </label>
-                        <input aria-readonly="true"
-                               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
-                               id="estado" name="estado" readonly="" type="text"  th:value="${usuario.estado} ? 'ACTIVO' : 'INACTIVO'" />
+                        <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
+                               id="estado" name="estado" readonly type="text" th:value="${estado} ? 'ACTIVO' : 'INACTIVO'" />
                     </div>
+
+                    <!-- Rol - always readonly -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="rol_id">
                             Rol
                         </label>
-                        <input aria-readonly="true"
-                               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
-                               id="rol_id" name="rol_id" readonly="" type="text" th:field="*{usuario.roles.tipo_rol}"/>
+                        <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-200 text-gray-700 cursor-not-allowed focus:outline-none"
+                               id="rol_id" name="rol_id" readonly type="text" th:field="*{roles.tipo_rol}"/>
                     </div>
+
+                    <!-- Nombre Completo - editable -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="nombreCompleto">
                             Nombre Completo
                         </label>
                         <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
-                               id="nombreCompleto" name="nombreCompleto" readonly="" type="text" th:field="*{usuario.nombreCompleto}"/>
+                               id="nombreCompleto" name="nombreCompleto" readonly type="text" th:field="*{nombreCompleto}" required/>
+                        <p id="nombreError" class="text-red-500 text-sm hidden">El nombre completo es requerido</p>
                     </div>
+
+                    <!-- Email - editable -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1" for="email">
                             Email
                         </label>
                         <input class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none focus:border-blue-500"
-                               id="email" name="email" readonly="" type="email" th:field="*{usuario.email}"/>
+                               id="email" name="email" readonly type="email" th:field="*{email}" required/>
+                        <p id="emailError" class="text-red-500 text-sm hidden">Ingrese un email válido</p>
                     </div>
 
                     <!-- Form Actions (hidden by default, shown when editing) -->
@@ -106,22 +144,127 @@
     (() => {
         const form = document.getElementById('userForm');
         const togglePasswordBtn = document.getElementById('togglePassword');
+        const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
         const passwordInput = document.getElementById('contraseña');
+        const confirmPasswordInput = document.getElementById('confirmarContraseña');
+        const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
+        const passwordMatchError = document.getElementById('passwordMatchError');
+        const passwordError = document.getElementById('passwordError');
+        const nombreError = document.getElementById('nombreError');
+        const emailError = document.getElementById('emailError');
         const editButton = document.getElementById('editButton');
         const cancelButton = document.getElementById('cancelButton');
         const formActions = document.getElementById('formActions');
-        const readonlyInputs = form.querySelectorAll('input[readonly]:not([aria-readonly="true"])');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+
+        // Select only editable fields (excluding usuario, estado, and rol_id)
+        const editableInputs = form.querySelectorAll('input[readonly]:not([id="usuario"]):not([id="estado"]):not([id="rol_id"])');
 
         // Toggle password visibility
+        const togglePasswordVisibility = (input, button) => {
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            button.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        };
+
         togglePasswordBtn.addEventListener('click', () => {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            togglePasswordBtn.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+            togglePasswordVisibility(passwordInput, togglePasswordBtn);
+        });
+
+        toggleConfirmPasswordBtn.addEventListener('click', () => {
+            togglePasswordVisibility(confirmPasswordInput, toggleConfirmPasswordBtn);
+        });
+
+        // Check password match
+        const checkPasswordMatch = () => {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                passwordMatchError.classList.remove('hidden');
+                return false;
+            } else {
+                passwordMatchError.classList.add('hidden');
+                return true;
+            }
+        };
+
+        // Validate password strength
+        const validatePassword = () => {
+            const password = passwordInput.value;
+            const hasMinLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+
+            // Update requirement indicators
+            document.getElementById('lengthRequirement').className =
+                `flex items-center ${hasMinLength ? 'text-green-500' : 'text-gray-600'}`;
+            document.getElementById('uppercaseRequirement').className =
+                `flex items-center ${hasUppercase ? 'text-green-500' : 'text-gray-600'}`;
+            document.getElementById('lowercaseRequirement').className =
+                `flex items-center ${hasLowercase ? 'text-green-500' : 'text-gray-600'}`;
+            document.getElementById('numberRequirement').className =
+                `flex items-center ${hasNumber ? 'text-green-500' : 'text-gray-600'}`;
+
+            // Check if all requirements are met
+            const isValid = hasMinLength && hasUppercase && hasLowercase && hasNumber;
+
+            if (!isValid && password.length > 0) {
+                passwordError.classList.remove('hidden');
+            } else {
+                passwordError.classList.add('hidden');
+            }
+
+            return isValid;
+        };
+
+        // Validate required fields
+        const validateRequiredFields = () => {
+            let isValid = true;
+
+            // Check nombreCompleto
+            if (document.getElementById('nombreCompleto').value.trim() === '') {
+                nombreError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                nombreError.classList.add('hidden');
+            }
+
+            // Check email
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                emailError.classList.add('hidden');
+            }
+
+            // Check password if in edit mode
+            if (!confirmPasswordContainer.classList.contains('hidden')) {
+                if (!validatePassword()) {
+                    isValid = false;
+                }
+                if (!checkPasswordMatch()) {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        };
+
+        // Show password requirements when focused
+        passwordInput.addEventListener('focus', () => {
+            if (!confirmPasswordContainer.classList.contains('hidden')) {
+                passwordRequirements.classList.remove('hidden');
+            }
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            passwordRequirements.classList.add('hidden');
         });
 
         // Enable/disable form editing
         editButton.addEventListener('click', () => {
-            readonlyInputs.forEach(input => {
+            editableInputs.forEach(input => {
                 input.readOnly = !input.readOnly;
                 input.classList.toggle('bg-gray-100');
                 input.classList.toggle('bg-white');
@@ -129,19 +272,39 @@
                 input.classList.toggle('cursor-auto');
             });
 
+            // Show confirm password field only in edit mode
+            confirmPasswordContainer.classList.toggle('hidden');
+            confirmPasswordInput.value = ''; // Clear any previous value
+
+            // Show password requirements when entering edit mode
+            if (!confirmPasswordContainer.classList.contains('hidden')) {
+                passwordRequirements.classList.remove('hidden');
+            } else {
+                passwordRequirements.classList.add('hidden');
+            }
+
             formActions.classList.toggle('hidden');
             editButton.classList.toggle('hidden');
         });
 
         // Cancel editing
         cancelButton.addEventListener('click', () => {
-            readonlyInputs.forEach(input => {
+            editableInputs.forEach(input => {
                 input.readOnly = true;
                 input.classList.add('bg-gray-100');
                 input.classList.remove('bg-white');
                 input.classList.add('cursor-not-allowed');
                 input.classList.remove('cursor-auto');
             });
+
+            // Hide confirm password field when canceling
+            confirmPasswordContainer.classList.add('hidden');
+            confirmPasswordInput.value = '';
+            passwordMatchError.classList.add('hidden');
+            passwordError.classList.add('hidden');
+            nombreError.classList.add('hidden');
+            emailError.classList.add('hidden');
+            passwordRequirements.classList.add('hidden');
 
             formActions.classList.add('hidden');
             editButton.classList.remove('hidden');
@@ -150,30 +313,50 @@
         // Form submission
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (!form.checkValidity()) {
-                form.reportValidity();
+
+            // Validate all required fields
+            if (!validateRequiredFields()) {
                 return;
             }
 
-            const formData = new FormData(form);
-            const userData = {};
-            formData.forEach((val, key) => {
-                userData[key] = val;
-            });
+            // Check password strength and match before submission (only if in edit mode)
+            if (!confirmPasswordContainer.classList.contains('hidden')) {
+                if (!validatePassword()) {
+                    return;
+                }
+                if (!checkPasswordMatch()) {
+                    return;
+                }
+            }
 
-            alert('Profile saved:\n' + JSON.stringify(userData, null, 2));
+            // Submit the form if all validations pass
+            form.submit();
+        });
 
-            // Return to read-only mode after save
-            readonlyInputs.forEach(input => {
-                input.readOnly = true;
-                input.classList.add('bg-gray-100');
-                input.classList.remove('bg-white');
-                input.classList.add('cursor-not-allowed');
-                input.classList.remove('cursor-auto');
-            });
+        // Add event listeners for validation
+        passwordInput.addEventListener('input', () => {
+            if (!confirmPasswordContainer.classList.contains('hidden')) {
+                validatePassword();
+                checkPasswordMatch();
+            }
+        });
 
-            formActions.classList.add('hidden');
-            editButton.classList.remove('hidden');
+        confirmPasswordInput.addEventListener('input', () => {
+            checkPasswordMatch();
+        });
+
+        document.getElementById('nombreCompleto').addEventListener('input', () => {
+            if (document.getElementById('nombreCompleto').value.trim() !== '') {
+                nombreError.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', () => {
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(email)) {
+                emailError.classList.add('hidden');
+            }
         });
     })();
 </script>

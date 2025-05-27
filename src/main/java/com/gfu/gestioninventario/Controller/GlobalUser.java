@@ -1,5 +1,5 @@
 package com.gfu.gestioninventario.Controller;
-/*
+
 import com.gfu.gestioninventario.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,4 +18,3 @@ public class GlobalUser {
         return "";
     }
 }
-*/

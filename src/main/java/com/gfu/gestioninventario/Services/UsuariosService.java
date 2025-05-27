@@ -6,9 +6,11 @@ import com.gfu.gestioninventario.Models.Roles;
 import com.gfu.gestioninventario.Models.RoleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +23,12 @@ public class UsuariosService {
     @Autowired
     private RolesService rolesService;
 
-    //@Autowired
-    //private PasswordEncoder passwordEncoder; 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public Optional<Usuarios> findByUsername(String username) {
+        return  usuariosRepository.findByUsuario(username);
+    }
 
     public List<Usuarios> findAllUsuarios() {
         return usuariosRepository.findAll();
@@ -30,6 +36,9 @@ public class UsuariosService {
 
     public Optional<Usuarios> findById(Integer id) {
         return usuariosRepository.findById(id);
+    }
+    public Usuarios save(Usuarios usuario) {
+        return usuariosRepository.save(usuario);
     }
 
     public Usuarios saveUsuario(Usuarios usuario) {
@@ -47,7 +56,7 @@ public class UsuariosService {
                 throw new IllegalArgumentException("La contrasena debe tener al menos 8 caracteres.");
             }
             // Encriptar la contrasena antes de guardar para nuevos usuarios
-            //usuarioToSave.setContrasena(passwordEncoder.encode(usuarioToSave.getContrasena()));
+            usuarioToSave.setContrasena(passwordEncoder.encode(usuarioToSave.getContrasena()));
 
         } else {
             // Logica para EDITAR un usuario existente
@@ -72,7 +81,7 @@ public class UsuariosService {
                     throw new IllegalArgumentException("La nueva contrasena debe tener al menos 8 caracteres.");
                 }
                 // Encriptar la NUEVA contrasena antes de guardar
-                //usuarioToSave.setContrasena(passwordEncoder.encode(usuarioToSave.getContrasena()));
+                usuarioToSave.setContrasena(passwordEncoder.encode(usuarioToSave.getContrasena()));
             }
 
             // Asegurarse de que el rol del usuario se mantenga
@@ -131,4 +140,5 @@ public class UsuariosService {
                                  .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + tipoRol));
         usuario.setRoles(rol);
     }
+
 }

@@ -13,6 +13,8 @@ UsuariosRepository extends JpaRepository<Usuarios, Integer>{
     Optional<Usuarios> findByEmail(String email);
     Optional<Usuarios> findByNombreCompleto(String nombreCompleto);
 
+
+
     @Query("SELECT u FROM Usuarios u WHERE " +
            "CAST(u.usuario_id AS string) LIKE CONCAT('%', :keyword, '%') OR " +
            "LOWER(u.usuario) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +

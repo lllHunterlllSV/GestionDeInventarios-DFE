@@ -1,6 +1,6 @@
 
 package com.gfu.gestioninventario.security;
-/*
+
 import com.gfu.gestioninventario.Models.Usuarios;
 
 import java.util.Collection;
@@ -58,4 +58,3 @@ public class CustomUserDetails implements UserDetails {
         return usuario;
     }
 }
-*/
