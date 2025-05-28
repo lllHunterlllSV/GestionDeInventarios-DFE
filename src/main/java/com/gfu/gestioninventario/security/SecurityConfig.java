@@ -43,6 +43,7 @@ public class SecurityConfig {
                                     "/clientes/eliminar/**",
                                     "/configuracion/usuarios/eliminar/**"
 
+
                             ).hasRole("ADMIN")
 
                   // Rutas de configuración de usuarios (solo ADMIN)
@@ -62,9 +63,10 @@ public class SecurityConfig {
                        // Compras (ADMIN y MANAGER)
                             .requestMatchers("/compras/**").hasAnyRole("ADMIN","MANAGER")
                             .requestMatchers("/usuario/**").hasAnyRole("ADMIN","SALES","MANAGER")
+                              .requestMatchers("/stock/**").hasAnyRole("ADMIN", "MANAGER")
                     //Rutas de alerta
-                    .requestMatchers("/alertas/stock-bajo").hasAnyRole("ADMIN", "MANAGER")
-                    .requestMatchers("/stock/**").hasAnyRole("ADMIN", "MANAGER")
+                           .requestMatchers("/alertas/stock-bajo").hasAnyRole("ADMIN", "MANAGER")
+
 
 
 

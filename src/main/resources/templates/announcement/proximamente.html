@@ -1,0 +1,43 @@
+<html class="scroll-smooth" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>
+        Próximamente
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&amp;family=Roboto&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen justify-center items-center px-6">
+<main class="max-w-xl w-full text-center py-20">
+    <div class="mx-auto mb-10 rounded-full bg-red-600 p-12 shadow-lg inline-flex items-center justify-center">
+        <i aria-hidden="true" class="fas fa-hourglass-half text-white text-9xl"></i>
+    </div>
+    <h1 class="text-5xl font-extrabold text-red-600 mb-6">
+        ¡Muy pronto!
+    </h1>
+    <p class="text-lg text-gray-700 mb-8">
+        Estamos trabajando duro para traerte algo increíble. Mantente atento y vuelve pronto para descubrirlo.
+    </p>
+    <a aria-label="Volver a la página principal" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-md shadow-md hover:bg-red-700 transition-colors duration-300"
+       th:href="@{/dashboard}">
+        <i class="fas fa-home mr-2">
+        </i>
+
+    </a>
+</main>
+<footer class="w-full text-center py-6 border-t border-gray-200 text-gray-500 text-sm">
+    © 2024 Tu Empresa. Todos los derechos reservados.
+</footer>
+</body>
+</html>

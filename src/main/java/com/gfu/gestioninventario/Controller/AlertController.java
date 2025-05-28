@@ -23,4 +23,5 @@ public class AlertController {
         model.addAttribute("productos", productos);
         return "announcement/stock-bajo"; // tu vista
     }
+
 }

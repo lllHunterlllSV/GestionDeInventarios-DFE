@@ -25,7 +25,7 @@
             <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/login}">
                 <i class="fas fa-sign-in-alt w-5"></i>
                 <span class="ml-3 text-sm font-medium">
-                        Login / Autenticación
+                        Cerrar Sesion
                     </span>
             </a>
             <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/productos/categorias}">
@@ -33,6 +33,13 @@
                 <span class="ml-3 text-sm font-medium">
                         Gestión de productos
                     </span>
+            </a>
+            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors"
+               th:href="@{/stock/lista}">
+                <i class="fas fa-cash-register w-5"></i>
+                <span class="ml-3 text-sm font-medium">
+                Stock Disponible
+             </span>
             </a>
             <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/proveedores/lista}">
                 <i class="fas fa-truck w-5"></i>
@@ -55,19 +62,19 @@
         Módulo de ventas
     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/gestion-entradas}">
+            <a th:href="@{/proximamente}"class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" >
                 <i class="fas fa-arrow-down w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de entradas
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/gestion-salidas}">
+            <a th:href="@{/proximamente}" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" >
                 <i class="fas fa-arrow-up w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Gestión de salidas
                     </span>
             </a>
-            <a class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors" th:href="@{/historial-movimientos}">
+            <a th:href="@{/proximamente}" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors">
                 <i class="fas fa-history w-5"></i>
                 <span class="ml-3 text-sm font-medium">
                         Historial de movimientos

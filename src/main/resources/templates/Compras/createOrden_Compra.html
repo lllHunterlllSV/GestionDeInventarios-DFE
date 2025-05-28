@@ -13,6 +13,8 @@
             <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Registrar Nueva Orden de Compra</h2>
 
             <form id="formOrden" th:action="@{/compras/ordenCompleta}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
                 <!-- Datos generales -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div>

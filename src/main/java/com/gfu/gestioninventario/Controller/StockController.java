@@ -21,6 +21,7 @@ public class StockController {
 
     // Define size options as a constant
     private static final List<Integer> SIZE_OPTIONS = List.of(5, 10, 20, 50);
+    private static final int LOW_STOCK_THRESHOLD = 10;
 
     @GetMapping("/lista")
     public String listarStock(Model model,
@@ -52,6 +53,8 @@ public class StockController {
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
         model.addAttribute("sizeOptions", SIZE_OPTIONS);
+
+        model.addAttribute("lowStockThreshold", LOW_STOCK_THRESHOLD);
 
         // Calculate total pages
         int totalPages = (int) Math.ceil((double) resultado.getTotalRecords() / size);

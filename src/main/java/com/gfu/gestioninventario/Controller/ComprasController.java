@@ -69,11 +69,11 @@ public class ComprasController {
         try {
             OrdenCompra orden = ordenCompraService.obtenerPorId(ordenId);
 
-            if (orden.getEstado() == EstadoOrden.PENDIENTE) {
+            if (orden.getEstado() == EstadoOrden.PENDIENTE || orden.getEstado() == EstadoOrden.CANCELADO) {
                 ordenCompraService.eliminarOrdenCompleta(ordenId);
                 return "redirect:/compras/lista?exito=Orden eliminada correctamente";
             } else {
-                return "redirect:/compras/lista?error=Solo puede eliminar órdenes en estado PENDIENTE";
+                return "redirect:/compras/lista?error=Solo puede eliminar órdenes en estado RECIBIDO Y CANCELADO";
             }
         } catch (Exception e) {
             return "redirect:/compras/lista?error=" + e.getMessage();

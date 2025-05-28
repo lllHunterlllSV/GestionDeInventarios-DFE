@@ -9,4 +9,9 @@ public class ErrorController {
     public String accessDenied() {
         return "/announcement/accessDenied";
     }
+
+    @GetMapping("/proximamente")
+    public String proximamente() {
+        return "/announcement/proximamente";
+    }
 }

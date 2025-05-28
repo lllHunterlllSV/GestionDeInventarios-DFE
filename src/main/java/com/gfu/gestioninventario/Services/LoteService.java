@@ -120,9 +120,9 @@ public class LoteService {
         OrdenCompra orden = ordenCompraRepository.findById(ordenId)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
-        if (!EstadoOrden.PENDIENTE.equals(orden.getEstado())) {
+     /*   if (!EstadoOrden.PENDIENTE.equals(orden.getEstado())) {
             throw new IllegalStateException("Solo se pueden editar órdenes pendientes");
-        }
+        }*/
 
         // Eliminar movimientos anteriores
         for (Lote lote : orden.getLotes()) {
